@@ -13,6 +13,8 @@
             text-align: center;
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
         }
         h1 {
             font-size: 28px;
@@ -66,7 +68,7 @@
 <body>
 
     <h1>Inheritance Tax Rates Worldwide</h1>
-    <p>This map highlights countries with the highest inheritance tax rates in dark red, with lighter shades representing lower rates. White areas indicate no inheritance tax.</p>
+    <p>This map highlights countries with varying inheritance tax rates. Darker shades represent higher tax rates, while white indicates no inheritance tax.</p>
 
     <!-- Map Container -->
     <div id="map"></div>
@@ -79,80 +81,87 @@
             <span>0%</span>
             <span>55%</span>
         </div>
-        <br>
-        <strong>#1 Japan</strong>: 55%<br>
-        <strong>#2 South Korea</strong>: 50%<br>
-        <strong>#3 France</strong>: 45%<br>
-        <strong>#4 UK</strong>: 40%<br>
-        <strong>#5 USA</strong>: 40%
     </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    
+    <!-- D3.js for color scales -->
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
     <script>
-        // Initialize the map with zoom disabled and panning disabled
+        // Initialize the map with zoom and panning disabled
         var map = L.map('map', {
-            center: [20, 0], 
-            zoom: 2, 
-            zoomControl: false, 
-            scrollWheelZoom: false, 
+            center: [20, 0],
+            zoom: 2,
+            zoomControl: false,
+            scrollWheelZoom: false,
             doubleClickZoom: false,
             dragging: false // Disables panning
         });
 
-        // Use a world map with country names visible
-        L.tileLayer('https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}{r}.png', {
+        // Use a high-contrast map with labeled country names (not continents)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap & CartoDB contributors'
         }).addTo(map);
 
-        // Define color gradient based on inheritance tax rates
-        function getColor(rate) {
-            return rate >= 50 ? '#d73027' :  // Top 5 highest (dark red)
-                   rate >= 40 ? '#fc8d59' :  // High Tax (40-49%)
-                   rate >= 20 ? '#fee08b' :  // Medium Tax (20-39%)
-                   rate > 0   ? '#f7f7f7' :  // Low Tax (1-19%)
-                               '#ffffff';   // No Tax (White)
-        }
+        // Overlay country names separately to ensure visibility
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+            attribution: ''
+        }).addTo(map);
 
-        // Country Data: [Name, Lat, Lng, Tax Rate, Extra Info]
-        var countries = [
-            ["Japan", 36.2048, 138.2529, 55, "Highest tax globally"],
-            ["South Korea", 35.9078, 127.7669, 50, "Strict inheritance rules"],
-            ["France", 46.6034, 1.8883, 45, "Progressive taxation"],
-            ["United Kingdom", 55.3781, -3.4360, 40, "Nil Rate Band: £325K"],
-            ["United States", 37.0902, -95.7129, 40, "Exemption: $13.61M estate"],
-            ["Spain", 40.4637, -3.7492, 34, "Regional variations apply"],
-            ["Netherlands", 52.1326, 5.2913, 20, "Tax reliefs for direct heirs"],
-            ["Germany", 51.1657, 10.4515, 30, "Up to €400K exemption"],
-            ["Italy", 41.8719, 12.5674, 8, "Rates 4%-8% based on relationship"],
-            ["Switzerland", 46.8182, 8.2275, 40, "Varies by canton"],
-            ["Denmark", 56.2639, 9.5018, 36, "Rates up to 36.25%"],
-            ["Norway", 60.4720, 8.4689, 0, "Abolished in 2014"],
-            ["Sweden", 60.1282, 18.6435, 0, "Abolished in 2005"],
-            ["Canada", 56.1304, -106.3468, 0, "No inheritance tax"],
-            ["Australia", -25.2744, 133.7751, 0, "No inheritance tax"],
-            ["China", 35.8617, 104.1954, 0, "No inheritance tax"]
-        ];
+        // Define color scale based on inheritance tax rates
+        var colorScale = d3.scaleSequential(d3.interpolateReds)
+            .domain([0, 55]); // 0% to 55%
 
-        // Add colored regions for each country
-        countries.forEach(function(country) {
-            var color = getColor(country[3]);
+        // Country Data: [Name, Tax Rate, Extra Info]
+        var countries = {
+            "Japan": { "taxRate": 55, "info": "Highest tax globally" },
+            "South Korea": { "taxRate": 50, "info": "Strict inheritance rules" },
+            "France": { "taxRate": 45, "info": "Progressive taxation" },
+            "United Kingdom": { "taxRate": 40, "info": "Nil Rate Band: £325K" },
+            "United States": { "taxRate": 40, "info": "Exemption: $13.61M estate" },
+            "Spain": { "taxRate": 34, "info": "Regional variations apply" },
+            "Netherlands": { "taxRate": 20, "info": "Tax reliefs for direct heirs" },
+            "Germany": { "taxRate": 30, "info": "Up to €400K exemption" },
+            "Italy": { "taxRate": 8, "info": "Rates 4%-8% based on relationship" },
+            "Switzerland": { "taxRate": 40, "info": "Varies by canton" },
+            "Denmark": { "taxRate": 36, "info": "Rates up to 36.25%" },
+            "Norway": { "taxRate": 0, "info": "Abolished in 2014" },
+            "Sweden": { "taxRate": 0, "info": "Abolished in 2005" },
+            "Canada": { "taxRate": 0, "info": "No inheritance tax" },
+            "Australia": { "taxRate": 0, "info": "No inheritance tax" },
+            "China": { "taxRate": 0, "info": "No inheritance tax" }
+        };
 
-            var polygon = L.circle([country[1], country[2]], {
-                radius: 250000,
-                fillColor: color,
-                color: color,
-                weight: 1,
-                fillOpacity: 0.7
-            }).addTo(map);
-
-            polygon.bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[4]}`);
-            polygon.on('mouseover', function () { this.openPopup(); });
-            polygon.on('mouseout', function () { this.closePopup(); });
-        });
+        // Fetch GeoJSON data for world countries
+        fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
+            .then(response => response.json())
+            .then(geoData => {
+                L.geoJson(geoData, {
+                    style: function(feature) {
+                        var countryName = feature.properties.name;
+                        var taxRate = countries[countryName] ? countries[countryName].taxRate : 0;
+                        return {
+                            fillColor: colorScale(taxRate),
+                            weight: 1,
+                            opacity: 1,
+                            color: '#333',
+                            fillOpacity: 0.8
+                        };
+                    },
+                    onEachFeature: function(feature, layer) {
+                        var countryName = feature.properties.name;
+                        if (countries[countryName]) {
+                            var taxInfo = countries[countryName].info;
+                            var taxRate = countries[countryName].taxRate;
+                            layer.bindPopup(`<strong>${countryName}</strong><br>Tax Rate: ${taxRate}%<br>${taxInfo}`);
+                        }
+                    }
+                }).addTo(map);
+            });
 
     </script>
 
 </body>
 </html>
+
