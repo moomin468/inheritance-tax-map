@@ -1,92 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Interactive Inheritance Tax Map</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { text-align: center; }
-    #map { height: 500px; width: 100%; margin: auto; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Inheritance Tax Map</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        #map-container { position: relative; width: 80%; margin: auto; }
+        .tooltip {
+            position: absolute;
+            display: none;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        svg { width: 100%; height: auto; }
+        .country { fill: #bbbbbb; stroke: #ffffff; stroke-width: 1; cursor: pointer; }
+        .high-tax { fill: #d9534f; } /* Red for high-tax countries */
+        .medium-tax { fill: #f0ad4e; } /* Orange for medium-tax */
+        .low-tax { fill: #5bc0de; } /* Blue for low-tax */
+    </style>
 </head>
 <body>
-  <h1>Inheritance Tax Comparison Map</h1>
-  <div id="map"></div>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script>
-    // Initialize the map, centered over Europe/North America for best coverage
-    var map = L.map('map').setView([50, 5], 4);
+    <h1>Inheritance Tax Rates by Country</h1>
+    <p>Hover over a country to see its inheritance tax rate.</p>
 
-    // Add a tile layer from OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    <div id="map-container">
+        <svg id="world-map" viewBox="0 0 1000 500">
+            <!-- Example countries (adjust coordinates accordingly) -->
+            <path id="uk" class="country high-tax" d="M300,120 L320,130 L310,150 Z" />
+            <path id="us" class="country medium-tax" d="M100,200 L200,200 L200,300 L100,300 Z" />
+            <path id="spain" class="country medium-tax" d="M350,250 L370,260 L360,280 Z" />
+            <path id="france" class="country high-tax" d="M340,220 L360,230 L350,250 Z" />
+            <path id="netherlands" class="country medium-tax" d="M360,180 L380,190 L370,210 Z" />
+            <path id="japan" class="country high-tax" d="M850,150 L870,160 L860,180 Z" />
+            <path id="south-korea" class="country high-tax" d="M820,180 L840,190 L830,210 Z" />
+        </svg>
+    </div>
 
-    // Data format: [Country Name, Latitude, Longitude, HTML content for popup]
-    var countries = [
-      ["United Kingdom", 55.3781, -3.4360,
-        "<strong>United Kingdom</strong><br>" +
-        "Inheritance Tax Rate: 40%<br>" +
-        "Threshold: £325,000<br>" +
-        "Additional: Nil rate band and main residence relief available."
-      ],
-      ["Germany", 51.1657, 10.4515,
-        "<strong>Germany</strong><br>" +
-        "Inheritance Tax: Progressive rates (7–50%)<br>" +
-        "Thresholds vary by relationship<br>" +
-        "Additional: Exemptions available for close relatives."
-      ],
-      ["France", 46.6034, 1.8883,
-        "<strong>France</strong><br>" +
-        "Inheritance Tax: Progressive (5–60%)<br>" +
-        "Thresholds vary by relationship<br>" +
-        "Additional: Higher rates may apply for distant relatives."
-      ],
-      ["Italy", 41.8719, 12.5674,
-        "<strong>Italy</strong><br>" +
-        "Inheritance Tax: Typically 4% for direct heirs<br>" +
-        "Exemptions for spouse and children<br>" +
-        "Additional: Rates differ based on relationship."
-      ],
-      ["United States", 37.0902, -95.7129,
-        "<strong>United States</strong><br>" +
-        "Estate Tax Rate: 40% (federal) on estates above threshold<br>" +
-        "Threshold: Approximately $12 million<br>" +
-        "Additional: Some states impose separate inheritance taxes."
-      ],
-      ["Spain", 40.4637, -3.7492,
-        "<strong>Spain</strong><br>" +
-        "Inheritance Tax: Varies regionally (approx. 7.65%–34%)<br>" +
-        "Exemptions depend on relationship and region<br>" +
-        "Additional: Significant variations across autonomous communities."
-      ],
-      ["Netherlands", 52.1326, 5.2913,
-        "<strong>Netherlands</strong><br>" +
-        "Inheritance Tax: 10–20% for close relatives; higher for others<br>" +
-        "Thresholds and exemptions apply<br>" +
-        "Additional: Progressive rates based on the value inherited."
-      ]
-    ];
+    <div id="tooltip" class="tooltip"></div>
 
-    // Loop through the country data to add markers with popups that open on hover
-    countries.forEach(function(country) {
-      var marker = L.marker([country[1], country[2]]).addTo(map);
-      marker.bindPopup(country[3]);
+    <script>
+        const countryData = {
+            "uk": "United Kingdom: 40% tax, £325,000 threshold",
+            "us": "United States: 40% tax, $12M estate exemption",
+            "spain": "Spain: 7.65%–34%, varies by region",
+            "france": "France: 45% max rate, progressive tax",
+            "netherlands": "Netherlands: 10-20% tax",
+            "japan": "Japan: 55% top rate, strict inheritance laws",
+            "south-korea": "South Korea: 50% inheritance tax"
+        };
 
-      // Open popup on mouseover and close on mouseout
-      marker.on('mouseover', function () {
-        this.openPopup();
-      });
-      marker.on('mouseout', function () {
-        this.closePopup();
-      });
-    });
-  </script>
+        document.querySelectorAll(".country").forEach(country => {
+            country.addEventListener("mouseover", function(event) {
+                const tooltip = document.getElementById("tooltip");
+                tooltip.innerText = countryData[this.id] || "No data available";
+                tooltip.style.display = "block";
+                tooltip.style.left = event.pageX + 10 + "px";
+                tooltip.style.top = event.pageY - 10 + "px";
+            });
+
+            country.addEventListener("mousemove", function(event) {
+                const tooltip = document.getElementById("tooltip");
+                tooltip.style.left = event.pageX + 10 + "px";
+                tooltip.style.top = event.pageY - 10 + "px";
+            });
+
+            country.addEventListener("mouseout", function() {
+                document.getElementById("tooltip").style.display = "none";
+            });
+        });
+    </script>
+
 </body>
 </html>
-
