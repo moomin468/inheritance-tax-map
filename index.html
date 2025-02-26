@@ -22,29 +22,33 @@
             display: none;
             background: white;
             border: 1px solid black;
-            padding: 5px;
+            padding: 8px;
             font-size: 14px;
             white-space: nowrap;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
         }
         .country-area {
             position: absolute;
             width: 50px; /* Adjust for each country */
             height: 50px; /* Adjust for each country */
-            background: rgba(255, 255, 255, 0);
+            background: rgba(255, 255, 255, 0); /* Invisible hover area */
         }
     </style>
 </head>
 <body>
     <h1>Inheritance Tax Rates by Country</h1>
+    <p>Hover over a country to see its inheritance tax rate.</p>
+
     <div class="map-container">
-        <!-- Replace with your map image -->
-        <img src="your-map-image.png" alt="World Map">
+        <img src="worldmap.png" alt="World Map">
         
-        <!-- Transparent country areas -->
-        <div class="country-area" style="top: 50px; left: 120px;" onmouseover="showTooltip(event, 'UK: 40% Tax Rate')" onmouseout="hideTooltip()"></div>
-        <div class="country-area" style="top: 90px; left: 300px;" onmouseover="showTooltip(event, 'Spain: 34% Tax Rate')" onmouseout="hideTooltip()"></div>
-        <div class="country-area" style="top: 100px; left: 450px;" onmouseover="showTooltip(event, 'Netherlands: 20% Tax Rate')" onmouseout="hideTooltip()"></div>
-        <div class="country-area" style="top: 80px; left: 600px;" onmouseover="showTooltip(event, 'USA: 40% Tax Rate')" onmouseout="hideTooltip()"></div>
+        <!-- Transparent country areas for hover tooltips -->
+        <div class="country-area" style="top: 50px; left: 120px;" onmouseover="showTooltip(event, '🇬🇧 UK: 40% Tax Rate')" onmouseout="hideTooltip()"></div>
+        <div class="country-area" style="top: 90px; left: 300px;" onmouseover="showTooltip(event, '🇪🇸 Spain: 34% Tax Rate')" onmouseout="hideTooltip()"></div>
+        <div class="country-area" style="top: 100px; left: 450px;" onmouseover="showTooltip(event, '🇳🇱 Netherlands: 20% Tax Rate')" onmouseout="hideTooltip()"></div>
+        <div class="country-area" style="top: 80px; left: 600px;" onmouseover="showTooltip(event, '🇺🇸 USA: 40% Tax Rate')" onmouseout="hideTooltip()"></div>
+        <div class="country-area" style="top: 70px; left: 900px;" onmouseover="showTooltip(event, '🇯🇵 Japan: 55% Tax Rate')" onmouseout="hideTooltip()"></div>
+        <div class="country-area" style="top: 75px; left: 850px;" onmouseover="showTooltip(event, '🇰🇷 South Korea: 50% Tax Rate')" onmouseout="hideTooltip()"></div>
     </div>
 
     <!-- Tooltip box -->
