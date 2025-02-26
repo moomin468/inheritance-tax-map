@@ -80,11 +80,11 @@
             <span>55%</span>
         </div>
         <br>
-        <strong>#1 Japan</strong>: 55% (Threshold: ¥30M / ~$200K USD)<br>
-        <strong>#2 South Korea</strong>: 50% (Threshold: KRW 500M / ~$375K USD)<br>
-        <strong>#3 France</strong>: 45% (Threshold: €100K for children)<br>
-        <strong>#4 UK</strong>: 40% (Threshold: £325K, £500K for main home)<br>
-        <strong>#5 USA</strong>: 40% (Exemption: $13.61M estate)
+        <strong>#1 Japan</strong>: 55%<br>
+        <strong>#2 South Korea</strong>: 50%<br>
+        <strong>#3 France</strong>: 45%<br>
+        <strong>#4 UK</strong>: 40%<br>
+        <strong>#5 USA</strong>: 40%
     </div>
 
     <!-- Leaflet JS -->
@@ -101,9 +101,9 @@
             dragging: false // Disables panning
         });
 
-        // Use a world map image where country names are labeled
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+        // Use a world map with country names visible
+        L.tileLayer('https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap & CartoDB contributors'
         }).addTo(map);
 
         // Define color gradient based on inheritance tax rates
@@ -117,17 +117,17 @@
 
         // Country Data: [Name, Lat, Lng, Tax Rate, Extra Info]
         var countries = [
-            ["Japan", 36.2048, 138.2529, 55, "Threshold: ¥30M (~$200K USD)"],
-            ["South Korea", 35.9078, 127.7669, 50, "Threshold: KRW 500M (~$375K USD)"],
-            ["France", 46.6034, 1.8883, 45, "Threshold: €100K for children"],
-            ["United Kingdom", 55.3781, -3.4360, 40, "Threshold: £325K, £500K if home passed to children"],
+            ["Japan", 36.2048, 138.2529, 55, "Highest tax globally"],
+            ["South Korea", 35.9078, 127.7669, 50, "Strict inheritance rules"],
+            ["France", 46.6034, 1.8883, 45, "Progressive taxation"],
+            ["United Kingdom", 55.3781, -3.4360, 40, "Nil Rate Band: £325K"],
             ["United States", 37.0902, -95.7129, 40, "Exemption: $13.61M estate"],
             ["Spain", 40.4637, -3.7492, 34, "Regional variations apply"],
             ["Netherlands", 52.1326, 5.2913, 20, "Tax reliefs for direct heirs"],
-            ["Germany", 51.1657, 10.4515, 30, "Exemptions up to €400K for spouses"],
+            ["Germany", 51.1657, 10.4515, 30, "Up to €400K exemption"],
             ["Italy", 41.8719, 12.5674, 8, "Rates 4%-8% based on relationship"],
             ["Switzerland", 46.8182, 8.2275, 40, "Varies by canton"],
-            ["Denmark", 56.2639, 9.5018, 36, "Rates up to 36.25% for distant relatives"],
+            ["Denmark", 56.2639, 9.5018, 36, "Rates up to 36.25%"],
             ["Norway", 60.4720, 8.4689, 0, "Abolished in 2014"],
             ["Sweden", 60.1282, 18.6435, 0, "Abolished in 2005"],
             ["Canada", 56.1304, -106.3468, 0, "No inheritance tax"],
