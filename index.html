@@ -1,57 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interactive Inheritance Tax Map</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-tooltip"></script>
-  <style>
-    #map { height: 500px; }
-    .tooltip { background-color: #fff; padding: 5px; border-radius: 5px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inheritance Tax Rates Worldwide</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            font-size: 28px;
+            color: #333;
+            margin-top: 20px;
+        }
+        p {
+            font-size: 16px;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+        #map {
+            width: 85%;
+            height: 550px;
+            margin: auto;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+        }
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+            line-height: 18px;
+        }
+        .legend-title {
+            font-weight: bold;
+        }
+        .gradient-bar {
+            width: 150px;
+            height: 10px;
+            background: linear-gradient(to right, #ffffff, #fee08b, #fc8d59, #d73027);
+        }
+        .gradient-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Interactive Inheritance Tax Map</h1>
-<p>Hover over the countries to see inheritance tax rates and exemptions.</p>
-<div id="map"></div>
+    <h1>Inheritance Tax Rates Worldwide</h1>
+    <p>This map highlights countries with the highest inheritance tax rates in dark red, with lighter shades representing lower rates. White areas indicate no inheritance tax.</p>
 
-<script>
-  // Initialize the map
-  var map = L.map('map').setView([20, 0], 2);  // Set the center of the map and zoom level
-  
-  // Add a tile layer (using OpenStreetMap tiles)
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    <!-- Map Container -->
+    <div id="map"></div>
 
-  // Define countries and their tax information
-  var countries = {
-    "United Kingdom": { lat: 51.5074, lon: -0.1278, taxRate: "40%", exemption: "£175,000" },
-    "United States": { lat: 37.0902, lon: -95.7129, taxRate: "40%", exemption: "Over $5 million" },
-    "Japan": { lat: 36.2048, lon: 138.2529, taxRate: "55%", exemption: "¥30 million" },
-    "France": { lat: 46.6034, lon: 1.8883, taxRate: "45%", exemption: "Varies by region" },
-    "South Korea": { lat: 36.5, lon: 127.5, taxRate: "50%", exemption: "Varies by inheritance" },
-    "Spain": { lat: 40.4637, lon: -3.7492, taxRate: "41%", exemption: "Varies by region" },
-    "Germany": { lat: 51.1657, lon: 10.4515, taxRate: "30%", exemption: "€500,000" },
-    "Italy": { lat: 41.8719, lon: 12.5674, taxRate: "4%", exemption: "Varies by inheritance" },
-    "Chile": { lat: -33.4489, lon: -70.6693, taxRate: "25%", exemption: "Varies by estate" },
-    "Brazil": { lat: -14.2350, lon: -51.9253, taxRate: "8%", exemption: "Varies by estate" }
-  };
+    <!-- Legend -->
+    <div class="legend">
+        <div class="legend-title">Inheritance Tax Rate (%)</div>
+        <div class="gradient-bar"></div>
+        <div class="gradient-labels">
+            <span>0%</span>
+            <span>55%</span>
+        </div>
+        <br>
+        <strong>#1 Japan</strong>: 55% (Highest Tax)<br>
+        <strong>#2 South Korea</strong>: 50%<br>
+        <strong>#3 France</strong>: 45%<br>
+        <strong>#4 UK</strong>: 40%<br>
+        <strong>#5 USA</strong>: 40%
+    </div>
 
-  // Add markers with tooltips for each country
-  for (var country in countries) {
-    var data = countries[country];
-    L.marker([data.lat, data.lon]).addTo(map)
-      .bindTooltip(country + ": " + data.taxRate, { permanent: false, direction: 'top' })
-      .on('mouseover', function (e) {
-        var countryName = e.target.getTooltip().getContent().split(":")[0];
-        var countryData = countries[countryName];
-        this.bindTooltip(countryName + ": " + countryData.taxRate + " - Exemption: " + countryData.exemption).openTooltip();
-      });
-  }
-</script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    
+    <script>
+        // Initialize the map with zoom disabled
+        var map = L.map('map', {
+            center: [20, 0], 
+            zoom: 2, 
+            zoomControl: false, 
+            scrollWheelZoom: false, 
+            doubleClickZoom: false
+        });
+
+        // Add tile layer (base map)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Define color gradient based on inheritance tax rates
+        function getColor(rate) {
+            return rate >= 50 ? '#d73027' :  // Top 5 highest (dark red)
+                   rate >= 40 ? '#fc8d59' :  // High Tax (40-49%)
+                   rate >= 20 ? '#fee08b' :  // Medium Tax (20-39%)
+                   rate > 0   ? '#f7f7f7' :  // Low Tax (1-19%)
+                               '#ffffff';   // No Tax (White)
+        }
+
+        // Top 5 highest inheritance tax countries (Ranked)
+        var top5Countries = {
+            "Japan": { rank: "#1", tax: "55%" },
+            "South Korea": { rank: "#2", tax: "50%" },
+            "France": { rank: "#3", tax: "45%" },
+            "United Kingdom": { rank: "#4", tax: "40%" },
+            "United States": { rank: "#5", tax: "40%" }
+        };
+
+        // Country Data: [Name, Lat, Lng, Tax Rate]
+        var countries = [
+            ["Japan", 36.2048, 138.2529, 55],
+            ["South Korea", 35.9078, 127.7669, 50],
+            ["France", 46.6034, 1.8883, 45],
+            ["United Kingdom", 55.3781, -3.4360, 40],
+            ["United States", 37.0902, -95.7129, 40],
+            ["Spain", 40.4637, -3.7492, 34],
+            ["Netherlands", 52.1326, 5.2913, 20],
+            ["Germany", 51.1657, 10.4515, 30],
+            ["Italy", 41.8719, 12.5674, 8],
+            ["Switzerland", 46.8182, 8.2275, 40],
+            ["Denmark", 56.2639, 9.5018, 36],
+            ["Norway", 60.4720, 8.4689, 0],
+            ["Sweden", 60.1282, 18.6435, 0],
+            ["Canada", 56.1304, -106.3468, 0],
+            ["Australia", -25.2744, 133.7751, 0],
+            ["China", 35.8617, 104.1954, 0]
+        ];
+
+        // Add colored regions for each country
+        countries.forEach(function(country) {
+            var color = getColor(country[3]);
+
+            var polygon = L.circle([country[1], country[2]], {
+                radius: 250000,
+                fillColor: color,
+                color: color,
+                weight: 1,
+                fillOpacity: 0.7
+            }).addTo(map);
+
+            var popupText = `<strong>${country[0]}</strong><br>Inheritance Tax Rate: ${country[3]}%`;
+
+            // Add ranking for top 5 countries
+            if (top5Countries[country[0]]) {
+                popupText = `<strong>${top5Countries[country[0]].rank} ${country[0]}</strong><br>Inheritance Tax Rate: ${top5Countries[country[0]].tax} (Highest)`;
+            }
+
+            polygon.bindPopup(popupText);
+            polygon.on('mouseover', function () { this.openPopup(); });
+            polygon.on('mouseout', function () { this.closePopup(); });
+        });
+
+    </script>
 
 </body>
 </html>
-
