@@ -87,7 +87,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
-        // Initialize the map with zoom and panning disabled
+        // Initialize the map with zoom disabled and panning disabled
         var map = L.map('map', {
             center: [20, 0],
             zoom: 2,
@@ -97,52 +97,59 @@
             dragging: false // Disables panning
         });
 
-        // Use a clear background map with visible country names
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap & CartoDB contributors'
+        // **NEW MAP STYLE**: Uses blue oceans & green land (NOT black & white)
+        L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Overlay country names separately to ensure visibility
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
-            attribution: ''
-        }).addTo(map);
+        // Define color scale for inheritance tax
+        function getColor(rate) {
+            return rate >= 50 ? '#d73027' :  // Top 5 highest (dark red)
+                   rate >= 40 ? '#fc8d59' :  // High Tax (40-49%)
+                   rate >= 20 ? '#fee08b' :  // Medium Tax (20-39%)
+                   rate > 0   ? '#f7f7f7' :  // Low Tax (1-19%)
+                               '#ffffff';   // No Tax (White)
+        }
 
-        // Country Data: [Name, Latitude, Longitude, Tax Rate, Rank, Description]
+        // Country Data: [Name, Lat, Lng, Tax Rate, Rank, Detailed Description]
         var countries = [
-            ["Japan", 36.2048, 138.2529, 55, "#1", "Highest global tax (55%)"],
-            ["South Korea", 35.9078, 127.7669, 50, "#2", "Strict inheritance laws"],
-            ["France", 46.6034, 1.8883, 45, "#3", "Progressive tax up to 45%"],
-            ["United Kingdom", 55.3781, -3.4360, 40, "#4", "40% tax above £325K"],
-            ["United States", 37.0902, -95.7129, 40, "#5", "Federal estate tax: 40%"],
-            ["Spain", 40.4637, -3.7492, 34, "", "Regional differences apply"],
-            ["Netherlands", 52.1326, 5.2913, 20, "", "Progressive tax up to 20%"],
-            ["Germany", 51.1657, 10.4515, 30, "", "Exemption: €400K for direct heirs"],
-            ["Italy", 41.8719, 12.5674, 8, "", "Rates vary by relationship"],
-            ["Switzerland", 46.8182, 8.2275, 40, "", "Varies by canton"],
-            ["Denmark", 56.2639, 9.5018, 36, "", "Progressive rates up to 36.25%"],
-            ["Norway", 60.4720, 8.4689, 0, "", "Abolished in 2014"],
-            ["Sweden", 60.1282, 18.6435, 0, "", "Abolished in 2005"],
-            ["Canada", 56.1304, -106.3468, 0, "", "No inheritance tax"],
-            ["Australia", -25.2744, 133.7751, 0, "", "No inheritance tax"]
+            ["Japan", 36.2048, 138.2529, 55, "#1", "Highest tax globally (55%). No exemptions. Heirs face heavy taxation."],
+            ["South Korea", 35.9078, 127.7669, 50, "#2", "Strict inheritance tax (50%). Some exemptions for direct heirs."],
+            ["France", 46.6034, 1.8883, 45, "#3", "Progressive taxation (up to 45%). Exemption: €100K per child."],
+            ["United Kingdom", 55.3781, -3.4360, 40, "#4", "40% tax above £325K. Exemption for spouse & charity donations."],
+            ["United States", 37.0902, -95.7129, 40, "#5", "Federal estate tax: 40%. Exemption: $13.61M per person."],
+            ["Spain", 40.4637, -3.7492, 34, "", "Varies by region. Wealthy heirs taxed more heavily."],
+            ["Netherlands", 52.1326, 5.2913, 20, "", "Progressive tax up to 20%. Direct heirs get relief."],
+            ["Germany", 51.1657, 10.4515, 30, "", "Up to 30% tax. Exemptions: €400K for spouses, €20K for others."],
+            ["Italy", 41.8719, 12.5674, 8, "", "Rates 4%-8% based on heir relationship."],
+            ["Switzerland", 46.8182, 8.2275, 40, "", "Varies by canton. Some regions tax up to 40%."],
+            ["Denmark", 56.2639, 9.5018, 36, "", "Progressive tax up to 36.25%. Direct heirs taxed lower."],
+            ["Norway", 60.4720, 8.4689, 0, "", "Abolished in 2014."],
+            ["Sweden", 60.1282, 18.6435, 0, "", "Abolished in 2005."],
+            ["Canada", 56.1304, -106.3468, 0, "", "No inheritance tax."],
+            ["Australia", -25.2744, 133.7751, 0, "", "No inheritance tax."]
         ];
 
-        // Add markers for the top 5 countries
+        // Apply full shading for each country
         countries.forEach(function(country) {
-            var isTop5 = country[4] !== "";
-            var markerHtml = `<div style="background:#d73027;color:white;padding:6px 10px;border-radius:50%;font-size:14px;font-weight:bold;">${country[4]}</div>`;
+            var color = getColor(country[3]);
 
-            var markerIcon = L.divIcon({
-                className: 'custom-icon',
-                html: markerHtml,
-                iconSize: [30, 30]
-            });
+            L.circle([country[1], country[2]], {
+                radius: 250000,
+                fillColor: color,
+                color: color,
+                weight: 1,
+                fillOpacity: 0.7
+            }).addTo(map)
+            .bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`);
 
-            if (isTop5) {
-                L.marker([country[1], country[2]], { icon: markerIcon }).addTo(map)
-                    .bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`);
-            } else {
-                L.marker([country[1], country[2]]).addTo(map)
-                    .bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`);
+            if (country[4]) {
+                var marker = L.divIcon({
+                    className: 'custom-icon',
+                    html: `<div style="background:#d73027;color:white;padding:6px 10px;border-radius:50%;font-size:14px;font-weight:bold;">${country[4]}</div>`,
+                    iconSize: [30, 30]
+                });
+                L.marker([country[1], country[2]], { icon: marker }).addTo(map);
             }
         });
 
