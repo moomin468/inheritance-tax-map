@@ -3,75 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inheritance Tax Map</title>
+    <title>Inheritance Tax Worldwide: How Different Countries Tax Wealth Transfer</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
     <style>
         body {
             text-align: center;
             font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
         }
-        .map-container {
-            position: relative;
-            display: inline-block;
+        h1 {
+            font-size: 28px;
+            color: #333;
+            margin-top: 20px;
         }
-        .map-container img {
-            max-width: 100%;
-            height: auto;
+        p {
+            font-size: 16px;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto 20px;
         }
-        .tooltip {
-            position: absolute;
-            display: none;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 8px;
-            font-size: 14px;
-            border-radius: 5px;
-            white-space: nowrap;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-        }
-        .country-marker {
-            position: absolute;
-            width: 12px; /* Circular marker size */
-            height: 12px;
-            background: red;
-            border-radius: 50%;
-            cursor: pointer;
+        #map {
+            width: 85%;
+            height: 550px;
+            margin: auto;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
 
-    <h1>Inheritance Tax Rates by Country</h1>
-    <p>Hover over a country to see its tax rate.</p>
+    <h1>Inheritance Tax Worldwide: How Different Countries Tax Wealth Transfer</h1>
+    <p>Inheritance tax policies vary across the globe, with some countries imposing high rates to reduce wealth inequality, while others have abolished them entirely. Hover over a country to see its inheritance tax details.</p>
 
-    <div class="map-container">
-        <!-- Replace 'worldmap.png' with your uploaded map image -->
-        <img src="worldmap.png" alt="World Map">
+    <!-- Map Container -->
+    <div id="map"></div>
 
-        <!-- Country markers (Adjust positions for accuracy) -->
-        <div class="country-marker" style="top: 20%; left: 50%;" onmouseover="showTooltip(event, '🇬🇧 UK: 40% Tax Rate<br>Nil Rate Band: £325,000')" onmouseout="hideTooltip()"></div>
-        <div class="country-marker" style="top: 35%; left: 20%;" onmouseover="showTooltip(event, '🇺🇸 USA: 40% Tax Rate<br>Exemption: $12M estate threshold')" onmouseout="hideTooltip()"></div>
-        <div class="country-marker" style="top: 40%; left: 60%;" onmouseover="showTooltip(event, '🇪🇸 Spain: 34% Tax Rate<br>Varies by region')" onmouseout="hideTooltip()"></div>
-        <div class="country-marker" style="top: 38%; left: 65%;" onmouseover="showTooltip(event, '🇫🇷 France: 45% Tax Rate<br>Progressive tax system')" onmouseout="hideTooltip()"></div>
-        <div class="country-marker" style="top: 42%; left: 67%;" onmouseover="showTooltip(event, '🇳🇱 Netherlands: 20% Tax Rate<br>Different rates for close relatives')" onmouseout="hideTooltip()"></div>
-        <div class="country-marker" style="top: 25%; left: 80%;" onmouseover="showTooltip(event, '🇯🇵 Japan: 55% Tax Rate<br>One of the highest globally')" onmouseout="hideTooltip()"></div>
-        <div class="country-marker" style="top: 30%; left: 85%;" onmouseover="showTooltip(event, '🇰🇷 South Korea: 50% Tax Rate<br>Strict inheritance tax laws')" onmouseout="hideTooltip()"></div>
-    </div>
-
-    <!-- Tooltip Box -->
-    <div class="tooltip" id="tooltip"></div>
-
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    
     <script>
-        function showTooltip(event, text) {
-            let tooltip = document.getElementById("tooltip");
-            tooltip.innerHTML = text;
-            tooltip.style.display = "block";
-            tooltip.style.left = (event.pageX + 10) + "px";
-            tooltip.style.top = (event.pageY - 10) + "px";
-        }
+        // Initialize the map with zoom disabled
+        var map = L.map('map', {
+            center: [20, 0], // Center globally
+            zoom: 2, 
+            zoomControl: false, 
+            scrollWheelZoom: false, 
+            doubleClickZoom: false
+        });
 
-        function hideTooltip() {
-            document.getElementById("tooltip").style.display = "none";
-        }
+        // Add tile layer (base map)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Country Data: [Country Name, Latitude, Longitude, Tax Info]
+        var countries = [
+            ["United Kingdom", 55.3781, -3.4360, "🇬🇧 UK: 40% Tax Rate<br>Nil Rate Band: £325,000"],
+            ["United States", 37.0902, -95.7129, "🇺🇸 USA: 40% Tax Rate<br>Exemption: $12M estate threshold"],
+            ["Spain", 40.4637, -3.7492, "🇪🇸 Spain: 34% Tax Rate<br>Varies by region"],
+            ["France", 46.6034, 1.8883, "🇫🇷 France: 45% Tax Rate<br>Progressive tax system"],
+            ["Netherlands", 52.1326, 5.2913, "🇳🇱 Netherlands: 20% Tax Rate<br>Progressive based on inheritance value"],
+            ["Japan", 36.2048, 138.2529, "🇯🇵 Japan: 55% Tax Rate<br>One of the highest globally"],
+            ["South Korea", 35.9078, 127.7669, "🇰🇷 South Korea: 50% Tax Rate<br>Strict inheritance tax laws"],
+            ["Australia", -25.2744, 133.7751, "🇦🇺 Australia: No inheritance tax"],
+            ["Canada", 56.1304, -106.3468, "🇨🇦 Canada: No inheritance tax"],
+            ["Germany", 51.1657, 10.4515, "🇩🇪 Germany: Up to 30% Tax Rate<br>Progressive tax system"],
+            ["Italy", 41.8719, 12.5674, "🇮🇹 Italy: 4% to 8% Tax Rate<br>Based on relationship to the deceased"],
+            ["Sweden", 60.1282, 18.6435, "🇸🇪 Sweden: No inheritance tax<br>Abolished in 2005"],
+            ["Norway", 60.4720, 8.4689, "🇳🇴 Norway: No inheritance tax<br>Abolished in 2014"],
+            ["Denmark", 56.2639, 9.5018, "🇩🇰 Denmark: 15% to 36.25% Tax Rate<br>Varies based on relationship"],
+            ["Switzerland", 46.8182, 8.2275, "🇨🇭 Switzerland: Varies by Canton<br>Up to 40%"],
+            ["Brazil", -14.2350, -51.9253, "🇧🇷 Brazil: 4% to 8% Tax Rate<br>Varies by state"],
+            ["China", 35.8617, 104.1954, "🇨🇳 China: No inheritance tax<br>But estate reforms are being discussed"]
+        ];
+
+        // Add Markers with Hover Popups
+        countries.forEach(function(country) {
+            var marker = L.circleMarker([country[1], country[2]], {
+                color: 'red',
+                fillColor: 'red',
+                fillOpacity: 0.7,
+                radius: 6
+            }).addTo(map);
+
+            marker.bindPopup(country[3]);
+
+            // Show popup on hover
+            marker.on('mouseover', function () {
+                this.openPopup();
+            });
+
+            marker.on('mouseout', function () {
+                this.closePopup();
+            });
+        });
+
     </script>
 
 </body>
