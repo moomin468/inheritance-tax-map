@@ -87,7 +87,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
-        // Initialize the map with zoom disabled and panning disabled
+        // Initialize the map with zoom and panning disabled
         var map = L.map('map', {
             center: [20, 0],
             zoom: 2,
@@ -107,23 +107,23 @@
             attribution: ''
         }).addTo(map);
 
-        // Country Data: [Name, Latitude, Longitude, Tax Rate, Rank]
+        // Country Data: [Name, Latitude, Longitude, Tax Rate, Rank, Description]
         var countries = [
-            ["Japan", 36.2048, 138.2529, 55, "#1"],
-            ["South Korea", 35.9078, 127.7669, 50, "#2"],
-            ["France", 46.6034, 1.8883, 45, "#3"],
-            ["United Kingdom", 55.3781, -3.4360, 40, "#4"],
-            ["United States", 37.0902, -95.7129, 40, "#5"],
-            ["Spain", 40.4637, -3.7492, 34, ""],
-            ["Netherlands", 52.1326, 5.2913, 20, ""],
-            ["Germany", 51.1657, 10.4515, 30, ""],
-            ["Italy", 41.8719, 12.5674, 8, ""],
-            ["Switzerland", 46.8182, 8.2275, 40, ""],
-            ["Denmark", 56.2639, 9.5018, 36, ""],
-            ["Norway", 60.4720, 8.4689, 0, ""],
-            ["Sweden", 60.1282, 18.6435, 0, ""],
-            ["Canada", 56.1304, -106.3468, 0, ""],
-            ["Australia", -25.2744, 133.7751, 0, ""]
+            ["Japan", 36.2048, 138.2529, 55, "#1", "Highest global tax (55%)"],
+            ["South Korea", 35.9078, 127.7669, 50, "#2", "Strict inheritance laws"],
+            ["France", 46.6034, 1.8883, 45, "#3", "Progressive tax up to 45%"],
+            ["United Kingdom", 55.3781, -3.4360, 40, "#4", "40% tax above £325K"],
+            ["United States", 37.0902, -95.7129, 40, "#5", "Federal estate tax: 40%"],
+            ["Spain", 40.4637, -3.7492, 34, "", "Regional differences apply"],
+            ["Netherlands", 52.1326, 5.2913, 20, "", "Progressive tax up to 20%"],
+            ["Germany", 51.1657, 10.4515, 30, "", "Exemption: €400K for direct heirs"],
+            ["Italy", 41.8719, 12.5674, 8, "", "Rates vary by relationship"],
+            ["Switzerland", 46.8182, 8.2275, 40, "", "Varies by canton"],
+            ["Denmark", 56.2639, 9.5018, 36, "", "Progressive rates up to 36.25%"],
+            ["Norway", 60.4720, 8.4689, 0, "", "Abolished in 2014"],
+            ["Sweden", 60.1282, 18.6435, 0, "", "Abolished in 2005"],
+            ["Canada", 56.1304, -106.3468, 0, "", "No inheritance tax"],
+            ["Australia", -25.2744, 133.7751, 0, "", "No inheritance tax"]
         ];
 
         // Add markers for the top 5 countries
@@ -139,7 +139,10 @@
 
             if (isTop5) {
                 L.marker([country[1], country[2]], { icon: markerIcon }).addTo(map)
-                    .bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%`);
+                    .bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`);
+            } else {
+                L.marker([country[1], country[2]]).addTo(map)
+                    .bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`);
             }
         });
 
@@ -147,5 +150,3 @@
 
 </body>
 </html>
-
-
