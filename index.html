@@ -85,11 +85,9 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <!-- D3.js for color scales -->
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
     <script>
-        // Initialize the map with zoom and panning disabled
+        // Initialize the map with zoom disabled and panning disabled
         var map = L.map('map', {
             center: [20, 0],
             zoom: 2,
@@ -99,7 +97,7 @@
             dragging: false // Disables panning
         });
 
-        // Use a high-contrast map with labeled country names (not continents)
+        // Use a clear background map with visible country names
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap & CartoDB contributors'
         }).addTo(map);
@@ -109,59 +107,45 @@
             attribution: ''
         }).addTo(map);
 
-        // Define color scale based on inheritance tax rates
-        var colorScale = d3.scaleSequential(d3.interpolateReds)
-            .domain([0, 55]); // 0% to 55%
+        // Country Data: [Name, Latitude, Longitude, Tax Rate, Rank]
+        var countries = [
+            ["Japan", 36.2048, 138.2529, 55, "#1"],
+            ["South Korea", 35.9078, 127.7669, 50, "#2"],
+            ["France", 46.6034, 1.8883, 45, "#3"],
+            ["United Kingdom", 55.3781, -3.4360, 40, "#4"],
+            ["United States", 37.0902, -95.7129, 40, "#5"],
+            ["Spain", 40.4637, -3.7492, 34, ""],
+            ["Netherlands", 52.1326, 5.2913, 20, ""],
+            ["Germany", 51.1657, 10.4515, 30, ""],
+            ["Italy", 41.8719, 12.5674, 8, ""],
+            ["Switzerland", 46.8182, 8.2275, 40, ""],
+            ["Denmark", 56.2639, 9.5018, 36, ""],
+            ["Norway", 60.4720, 8.4689, 0, ""],
+            ["Sweden", 60.1282, 18.6435, 0, ""],
+            ["Canada", 56.1304, -106.3468, 0, ""],
+            ["Australia", -25.2744, 133.7751, 0, ""]
+        ];
 
-        // Country Data: [Name, Tax Rate, Extra Info]
-        var countries = {
-            "Japan": { "taxRate": 55, "info": "Highest tax globally" },
-            "South Korea": { "taxRate": 50, "info": "Strict inheritance rules" },
-            "France": { "taxRate": 45, "info": "Progressive taxation" },
-            "United Kingdom": { "taxRate": 40, "info": "Nil Rate Band: £325K" },
-            "United States": { "taxRate": 40, "info": "Exemption: $13.61M estate" },
-            "Spain": { "taxRate": 34, "info": "Regional variations apply" },
-            "Netherlands": { "taxRate": 20, "info": "Tax reliefs for direct heirs" },
-            "Germany": { "taxRate": 30, "info": "Up to €400K exemption" },
-            "Italy": { "taxRate": 8, "info": "Rates 4%-8% based on relationship" },
-            "Switzerland": { "taxRate": 40, "info": "Varies by canton" },
-            "Denmark": { "taxRate": 36, "info": "Rates up to 36.25%" },
-            "Norway": { "taxRate": 0, "info": "Abolished in 2014" },
-            "Sweden": { "taxRate": 0, "info": "Abolished in 2005" },
-            "Canada": { "taxRate": 0, "info": "No inheritance tax" },
-            "Australia": { "taxRate": 0, "info": "No inheritance tax" },
-            "China": { "taxRate": 0, "info": "No inheritance tax" }
-        };
+        // Add markers for the top 5 countries
+        countries.forEach(function(country) {
+            var isTop5 = country[4] !== "";
+            var markerHtml = `<div style="background:#d73027;color:white;padding:6px 10px;border-radius:50%;font-size:14px;font-weight:bold;">${country[4]}</div>`;
 
-        // Fetch GeoJSON data for world countries
-        fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
-            .then(response => response.json())
-            .then(geoData => {
-                L.geoJson(geoData, {
-                    style: function(feature) {
-                        var countryName = feature.properties.name;
-                        var taxRate = countries[countryName] ? countries[countryName].taxRate : 0;
-                        return {
-                            fillColor: colorScale(taxRate),
-                            weight: 1,
-                            opacity: 1,
-                            color: '#333',
-                            fillOpacity: 0.8
-                        };
-                    },
-                    onEachFeature: function(feature, layer) {
-                        var countryName = feature.properties.name;
-                        if (countries[countryName]) {
-                            var taxInfo = countries[countryName].info;
-                            var taxRate = countries[countryName].taxRate;
-                            layer.bindPopup(`<strong>${countryName}</strong><br>Tax Rate: ${taxRate}%<br>${taxInfo}`);
-                        }
-                    }
-                }).addTo(map);
+            var markerIcon = L.divIcon({
+                className: 'custom-icon',
+                html: markerHtml,
+                iconSize: [30, 30]
             });
+
+            if (isTop5) {
+                L.marker([country[1], country[2]], { icon: markerIcon }).addTo(map)
+                    .bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%`);
+            }
+        });
 
     </script>
 
 </body>
 </html>
+
 
