@@ -1,1 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Interactive Inheritance Tax Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { text-align: center; }
+    #map { height: 500px; width: 100%; margin: auto; }
+  </style>
+</head>
+<body>
+  <h1>Inheritance Tax Comparison Map</h1>
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Initialize the map, centered over Europe/North America for best coverage
+    var map = L.map('map').setView([50, 5], 4);
+
+    // Add a tile layer from OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Data format: [Country Name, Latitude, Longitude, HTML content for popup]
+    var countries = [
+      ["United Kingdom", 55.3781, -3.4360,
+        "<strong>United Kingdom</strong><br>" +
+        "Inheritance Tax Rate: 40%<br>" +
+        "Threshold: £325,000<br>" +
+        "Additional: Nil rate band and main residence relief available."
+      ],
+      ["Germany", 51.1657, 10.4515,
+        "<strong>Germany</strong><br>" +
+        "Inheritance Tax: Progressive rates (7–50%)<br>" +
+        "Thresholds vary by relationship<br>" +
+        "Additional: Exemptions available for close relatives."
+      ],
+      ["France", 46.6034, 1.8883,
+        "<strong>France</strong><br>" +
+        "Inheritance Tax: Progressive (5–60%)<br>" +
+        "Thresholds vary by relationship<br>" +
+        "Additional: Higher rates may apply for distant relatives."
+      ],
+      ["Italy", 41.8719, 12.5674,
+        "<strong>Italy</strong><br>" +
+        "Inheritance Tax: Typically 4% for direct heirs<br>" +
+        "Exemptions for spouse and children<br>" +
+        "Additional: Rates differ based on relationship."
+      ],
+      ["United States", 37.0902, -95.7129,
+        "<strong>United States</strong><br>" +
+        "Estate Tax Rate: 40% (federal) on estates above threshold<br>" +
+        "Threshold: Approximately $12 million<br>" +
+        "Additional: Some states impose separate inheritance taxes."
+      ],
+      ["Spain", 40.4637, -3.7492,
+        "<strong>Spain</strong><br>" +
+        "Inheritance Tax: Varies regionally (approx. 7.65%–34%)<br>" +
+        "Exemptions depend on relationship and region<br>" +
+        "Additional: Significant variations across autonomous communities."
+      ],
+      ["Netherlands", 52.1326, 5.2913,
+        "<strong>Netherlands</strong><br>" +
+        "Inheritance Tax: 10–20% for close relatives; higher for others<br>" +
+        "Thresholds and exemptions apply<br>" +
+        "Additional: Progressive rates based on the value inherited."
+      ]
+    ];
+
+    // Loop through the country data to add markers with popups that open on hover
+    countries.forEach(function(country) {
+      var marker = L.marker([country[1], country[2]]).addTo(map);
+      marker.bindPopup(country[3]);
+
+      // Open popup on mouseover and close on mouseout
+      marker.on('mouseover', function () {
+        this.openPopup();
+      });
+      marker.on('mouseout', function () {
+        this.closePopup();
+      });
+    });
+  </script>
+</body>
+</html>
 
