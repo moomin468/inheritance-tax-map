@@ -38,24 +38,28 @@
             bottom: 20px;
             left: 20px;
             background: white;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 12px;
+            border-radius: 8px;
             font-size: 14px;
             box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
             line-height: 18px;
+            text-align: left;
         }
         .legend-title {
             font-weight: bold;
+            font-size: 16px;
         }
         .gradient-bar {
-            width: 150px;
-            height: 10px;
+            width: 180px;
+            height: 12px;
             background: linear-gradient(to right, #ffffff, #fee08b, #fc8d59, #d73027);
+            border-radius: 5px;
         }
         .gradient-labels {
             display: flex;
             justify-content: space-between;
             font-size: 12px;
+            margin-top: 4px;
         }
     </style>
 </head>
@@ -76,28 +80,29 @@
             <span>55%</span>
         </div>
         <br>
-        <strong>#1 Japan</strong>: 55% (Highest Tax)<br>
-        <strong>#2 South Korea</strong>: 50%<br>
-        <strong>#3 France</strong>: 45%<br>
-        <strong>#4 UK</strong>: 40%<br>
-        <strong>#5 USA</strong>: 40%
+        <strong>#1 Japan</strong>: 55% (Threshold: ¥30M / ~$200K USD)<br>
+        <strong>#2 South Korea</strong>: 50% (Threshold: KRW 500M / ~$375K USD)<br>
+        <strong>#3 France</strong>: 45% (Threshold: €100K for children)<br>
+        <strong>#4 UK</strong>: 40% (Threshold: £325K, £500K for main home)<br>
+        <strong>#5 USA</strong>: 40% (Exemption: $13.61M estate)
     </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     
     <script>
-        // Initialize the map with zoom disabled
+        // Initialize the map with zoom disabled and panning disabled
         var map = L.map('map', {
             center: [20, 0], 
             zoom: 2, 
             zoomControl: false, 
             scrollWheelZoom: false, 
-            doubleClickZoom: false
+            doubleClickZoom: false,
+            dragging: false // Disables panning
         });
 
-        // Add tile layer (base map)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        // Use a world map image where country names are labeled
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
@@ -110,33 +115,24 @@
                                '#ffffff';   // No Tax (White)
         }
 
-        // Top 5 highest inheritance tax countries (Ranked)
-        var top5Countries = {
-            "Japan": { rank: "#1", tax: "55%" },
-            "South Korea": { rank: "#2", tax: "50%" },
-            "France": { rank: "#3", tax: "45%" },
-            "United Kingdom": { rank: "#4", tax: "40%" },
-            "United States": { rank: "#5", tax: "40%" }
-        };
-
-        // Country Data: [Name, Lat, Lng, Tax Rate]
+        // Country Data: [Name, Lat, Lng, Tax Rate, Extra Info]
         var countries = [
-            ["Japan", 36.2048, 138.2529, 55],
-            ["South Korea", 35.9078, 127.7669, 50],
-            ["France", 46.6034, 1.8883, 45],
-            ["United Kingdom", 55.3781, -3.4360, 40],
-            ["United States", 37.0902, -95.7129, 40],
-            ["Spain", 40.4637, -3.7492, 34],
-            ["Netherlands", 52.1326, 5.2913, 20],
-            ["Germany", 51.1657, 10.4515, 30],
-            ["Italy", 41.8719, 12.5674, 8],
-            ["Switzerland", 46.8182, 8.2275, 40],
-            ["Denmark", 56.2639, 9.5018, 36],
-            ["Norway", 60.4720, 8.4689, 0],
-            ["Sweden", 60.1282, 18.6435, 0],
-            ["Canada", 56.1304, -106.3468, 0],
-            ["Australia", -25.2744, 133.7751, 0],
-            ["China", 35.8617, 104.1954, 0]
+            ["Japan", 36.2048, 138.2529, 55, "Threshold: ¥30M (~$200K USD)"],
+            ["South Korea", 35.9078, 127.7669, 50, "Threshold: KRW 500M (~$375K USD)"],
+            ["France", 46.6034, 1.8883, 45, "Threshold: €100K for children"],
+            ["United Kingdom", 55.3781, -3.4360, 40, "Threshold: £325K, £500K if home passed to children"],
+            ["United States", 37.0902, -95.7129, 40, "Exemption: $13.61M estate"],
+            ["Spain", 40.4637, -3.7492, 34, "Regional variations apply"],
+            ["Netherlands", 52.1326, 5.2913, 20, "Tax reliefs for direct heirs"],
+            ["Germany", 51.1657, 10.4515, 30, "Exemptions up to €400K for spouses"],
+            ["Italy", 41.8719, 12.5674, 8, "Rates 4%-8% based on relationship"],
+            ["Switzerland", 46.8182, 8.2275, 40, "Varies by canton"],
+            ["Denmark", 56.2639, 9.5018, 36, "Rates up to 36.25% for distant relatives"],
+            ["Norway", 60.4720, 8.4689, 0, "Abolished in 2014"],
+            ["Sweden", 60.1282, 18.6435, 0, "Abolished in 2005"],
+            ["Canada", 56.1304, -106.3468, 0, "No inheritance tax"],
+            ["Australia", -25.2744, 133.7751, 0, "No inheritance tax"],
+            ["China", 35.8617, 104.1954, 0, "No inheritance tax"]
         ];
 
         // Add colored regions for each country
@@ -151,14 +147,7 @@
                 fillOpacity: 0.7
             }).addTo(map);
 
-            var popupText = `<strong>${country[0]}</strong><br>Inheritance Tax Rate: ${country[3]}%`;
-
-            // Add ranking for top 5 countries
-            if (top5Countries[country[0]]) {
-                popupText = `<strong>${top5Countries[country[0]].rank} ${country[0]}</strong><br>Inheritance Tax Rate: ${top5Countries[country[0]].tax} (Highest)`;
-            }
-
-            polygon.bindPopup(popupText);
+            polygon.bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[4]}`);
             polygon.on('mouseover', function () { this.openPopup(); });
             polygon.on('mouseout', function () { this.closePopup(); });
         });
