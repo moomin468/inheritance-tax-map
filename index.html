@@ -3,77 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Inheritance Tax Map</title>
+    <title>Inheritance Tax Map</title>
     <style>
-        body { text-align: center; font-family: Arial, sans-serif; }
-        #map-container { position: relative; width: 80%; margin: auto; }
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .map-container {
+            position: relative;
+            display: inline-block;
+        }
+        .map-container img {
+            max-width: 100%;
+            height: auto;
+        }
         .tooltip {
             position: absolute;
             display: none;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 8px;
-            border-radius: 5px;
+            background: white;
+            border: 1px solid black;
+            padding: 5px;
             font-size: 14px;
+            white-space: nowrap;
         }
-        svg { width: 100%; height: auto; }
-        .country { fill: #bbbbbb; stroke: #ffffff; stroke-width: 1; cursor: pointer; }
-        .high-tax { fill: #d9534f; } /* Red for high-tax countries */
-        .medium-tax { fill: #f0ad4e; } /* Orange for medium-tax */
-        .low-tax { fill: #5bc0de; } /* Blue for low-tax */
+        .country-area {
+            position: absolute;
+            width: 50px; /* Adjust for each country */
+            height: 50px; /* Adjust for each country */
+            background: rgba(255, 255, 255, 0);
+        }
     </style>
 </head>
 <body>
-
     <h1>Inheritance Tax Rates by Country</h1>
-    <p>Hover over a country to see its inheritance tax rate.</p>
-
-    <div id="map-container">
-        <svg id="world-map" viewBox="0 0 1000 500">
-            <!-- Example countries (adjust coordinates accordingly) -->
-            <path id="uk" class="country high-tax" d="M300,120 L320,130 L310,150 Z" />
-            <path id="us" class="country medium-tax" d="M100,200 L200,200 L200,300 L100,300 Z" />
-            <path id="spain" class="country medium-tax" d="M350,250 L370,260 L360,280 Z" />
-            <path id="france" class="country high-tax" d="M340,220 L360,230 L350,250 Z" />
-            <path id="netherlands" class="country medium-tax" d="M360,180 L380,190 L370,210 Z" />
-            <path id="japan" class="country high-tax" d="M850,150 L870,160 L860,180 Z" />
-            <path id="south-korea" class="country high-tax" d="M820,180 L840,190 L830,210 Z" />
-        </svg>
+    <div class="map-container">
+        <!-- Replace with your map image -->
+        <img src="your-map-image.png" alt="World Map">
+        
+        <!-- Transparent country areas -->
+        <div class="country-area" style="top: 50px; left: 120px;" onmouseover="showTooltip(event, 'UK: 40% Tax Rate')" onmouseout="hideTooltip()"></div>
+        <div class="country-area" style="top: 90px; left: 300px;" onmouseover="showTooltip(event, 'Spain: 34% Tax Rate')" onmouseout="hideTooltip()"></div>
+        <div class="country-area" style="top: 100px; left: 450px;" onmouseover="showTooltip(event, 'Netherlands: 20% Tax Rate')" onmouseout="hideTooltip()"></div>
+        <div class="country-area" style="top: 80px; left: 600px;" onmouseover="showTooltip(event, 'USA: 40% Tax Rate')" onmouseout="hideTooltip()"></div>
     </div>
 
-    <div id="tooltip" class="tooltip"></div>
+    <!-- Tooltip box -->
+    <div class="tooltip" id="tooltip"></div>
 
     <script>
-        const countryData = {
-            "uk": "United Kingdom: 40% tax, £325,000 threshold",
-            "us": "United States: 40% tax, $12M estate exemption",
-            "spain": "Spain: 7.65%–34%, varies by region",
-            "france": "France: 45% max rate, progressive tax",
-            "netherlands": "Netherlands: 10-20% tax",
-            "japan": "Japan: 55% top rate, strict inheritance laws",
-            "south-korea": "South Korea: 50% inheritance tax"
-        };
+        function showTooltip(event, text) {
+            let tooltip = document.getElementById("tooltip");
+            tooltip.innerHTML = text;
+            tooltip.style.display = "block";
+            tooltip.style.left = (event.pageX + 10) + "px";
+            tooltip.style.top = (event.pageY - 20) + "px";
+        }
 
-        document.querySelectorAll(".country").forEach(country => {
-            country.addEventListener("mouseover", function(event) {
-                const tooltip = document.getElementById("tooltip");
-                tooltip.innerText = countryData[this.id] || "No data available";
-                tooltip.style.display = "block";
-                tooltip.style.left = event.pageX + 10 + "px";
-                tooltip.style.top = event.pageY - 10 + "px";
-            });
-
-            country.addEventListener("mousemove", function(event) {
-                const tooltip = document.getElementById("tooltip");
-                tooltip.style.left = event.pageX + 10 + "px";
-                tooltip.style.top = event.pageY - 10 + "px";
-            });
-
-            country.addEventListener("mouseout", function() {
-                document.getElementById("tooltip").style.display = "none";
-            });
-        });
+        function hideTooltip() {
+            document.getElementById("tooltip").style.display = "none";
+        }
     </script>
-
 </body>
 </html>
