@@ -48,7 +48,7 @@
 <body>
 
     <h1>Inheritance Tax Rates Worldwide</h1>
-    <p>Countries impose different inheritance tax rates, from very high to none at all. This map highlights these differences, with darker shades representing higher taxes.</p>
+    <p>This map highlights countries with the highest inheritance tax rates in red. Hover over a country to see its tax rate.</p>
 
     <!-- Map Container -->
     <div id="map"></div>
@@ -71,78 +71,30 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Color categories for tax levels
-        function getColor(rate) {
-            return rate > 40 ? '#d73027' :  // High Tax (40%+)
-                   rate > 20 ? '#fc8d59' :  // Medium Tax (20-39%)
-                   rate > 0  ? '#fee08b' :  // Low Tax (1-19%)
-                               '#1a9850';   // No Tax
-        }
-
-        // Country Data: [Country Name, Latitude, Longitude, Tax Info, Tax Rate, Flag URL]
+        // Country Data: [Country Name, Latitude, Longitude, Tax Rate]
         var countries = [
-            ["United Kingdom", 55.3781, -3.4360, "40%", "https://flagcdn.com/w40/gb.png"],
-            ["United States", 37.0902, -95.7129, "40%", "https://flagcdn.com/w40/us.png"],
-            ["Spain", 40.4637, -3.7492, "34%", "https://flagcdn.com/w40/es.png"],
-            ["France", 46.6034, 1.8883, "45%", "https://flagcdn.com/w40/fr.png"],
-            ["Netherlands", 52.1326, 5.2913, "20%", "https://flagcdn.com/w40/nl.png"],
-            ["Japan", 36.2048, 138.2529, "55%", "https://flagcdn.com/w40/jp.png"],
-            ["South Korea", 35.9078, 127.7669, "50%", "https://flagcdn.com/w40/kr.png"],
-            ["Australia", -25.2744, 133.7751, "No Tax", "https://flagcdn.com/w40/au.png"],
-            ["Canada", 56.1304, -106.3468, "No Tax", "https://flagcdn.com/w40/ca.png"],
-            ["Germany", 51.1657, 10.4515, "30%", "https://flagcdn.com/w40/de.png"],
-            ["Italy", 41.8719, 12.5674, "4%-8%", "https://flagcdn.com/w40/it.png"],
-            ["Sweden", 60.1282, 18.6435, "No Tax", "https://flagcdn.com/w40/se.png"],
-            ["Norway", 60.4720, 8.4689, "No Tax", "https://flagcdn.com/w40/no.png"],
-            ["Denmark", 56.2639, 9.5018, "15%-36%", "https://flagcdn.com/w40/dk.png"],
-            ["Switzerland", 46.8182, 8.2275, "Up to 40%", "https://flagcdn.com/w40/ch.png"],
-            ["Brazil", -14.2350, -51.9253, "4%-8%", "https://flagcdn.com/w40/br.png"],
-            ["China", 35.8617, 104.1954, "No Tax", "https://flagcdn.com/w40/cn.png"]
+            ["Japan", 36.2048, 138.2529, "55%"],
+            ["South Korea", 35.9078, 127.7669, "50%"],
+            ["France", 46.6034, 1.8883, "45%"],
+            ["United Kingdom", 55.3781, -3.4360, "40%"],
+            ["United States", 37.0902, -95.7129, "40%"]
         ];
 
-        // Add country shapes with colors based on tax rate
-        function style(feature) {
-            return {
-                fillColor: getColor(feature.properties.taxRate),
+        // Add markers for each country
+        countries.forEach(function(country) {
+            var circle = L.circleMarker([country[1], country[2]], {
+                radius: 8,
+                fillColor: 'red',
+                color: 'red',
                 weight: 1,
                 opacity: 1,
-                color: 'white',
-                fillOpacity: 0.7
-            };
-        }
+                fillOpacity: 0.8
+            }).addTo(map);
 
-        // Load world country shapes from GeoJSON
-        fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
-            .then(response => response.json())
-            .then(data => {
-                L.geoJson(data, {
-                    style: function (feature) {
-                        // Default to "No Tax" color if country not listed
-                        var taxRate = 0; 
-                        countries.forEach(country => {
-                            if (feature.properties.name === country[0]) {
-                                taxRate = parseFloat(country[2]) || 0;
-                            }
-                        });
-                        return style({ properties: { taxRate } });
-                    }
-                }).addTo(map);
-            });
+            circle.bindPopup(`<strong>${country[0]}</strong><br>Inheritance Tax Rate: ${country[3]}`);
 
-        // Add flag markers
-        countries.forEach(function(country) {
-            var icon = L.icon({
-                iconUrl: country[4], 
-                iconSize: [32, 21], 
-                iconAnchor: [16, 10]
-            });
-
-            var marker = L.marker([country[1], country[2]], { icon: icon }).addTo(map);
-
-            marker.bindPopup(`<strong>${country[0]}</strong><br>Inheritance Tax: ${country[2]}`);
-
-            marker.on('mouseover', function () { this.openPopup(); });
-            marker.on('mouseout', function () { this.closePopup(); });
+            circle.on('mouseover', function () { this.openPopup(); });
+            circle.on('mouseout', function () { this.closePopup(); });
         });
 
     </script>
