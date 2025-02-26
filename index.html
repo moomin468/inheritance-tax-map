@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inheritance Tax Worldwide: How Different Countries Tax Wealth Transfer</title>
+    <title>Inheritance Tax Rates Worldwide</title>
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -33,12 +33,22 @@
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
         }
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
 
-    <h1>Inheritance Tax Worldwide: How Different Countries Tax Wealth Transfer</h1>
-    <p>Inheritance tax policies vary across the globe, with some countries imposing high rates to reduce wealth inequality, while others have abolished them entirely. Hover over a country to see its inheritance tax details.</p>
+    <h1>Inheritance Tax Rates Worldwide</h1>
+    <p>Countries impose different inheritance tax rates, from very high to none at all. This map highlights these differences, with darker shades representing higher taxes.</p>
 
     <!-- Map Container -->
     <div id="map"></div>
@@ -49,7 +59,7 @@
     <script>
         // Initialize the map with zoom disabled
         var map = L.map('map', {
-            center: [20, 0], // Center globally
+            center: [20, 0], 
             zoom: 2, 
             zoomControl: false, 
             scrollWheelZoom: false, 
@@ -61,46 +71,78 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Country Data: [Country Name, Latitude, Longitude, Tax Info]
+        // Color categories for tax levels
+        function getColor(rate) {
+            return rate > 40 ? '#d73027' :  // High Tax (40%+)
+                   rate > 20 ? '#fc8d59' :  // Medium Tax (20-39%)
+                   rate > 0  ? '#fee08b' :  // Low Tax (1-19%)
+                               '#1a9850';   // No Tax
+        }
+
+        // Country Data: [Country Name, Latitude, Longitude, Tax Info, Tax Rate, Flag URL]
         var countries = [
-            ["United Kingdom", 55.3781, -3.4360, "🇬🇧 UK: 40% Tax Rate<br>Nil Rate Band: £325,000"],
-            ["United States", 37.0902, -95.7129, "🇺🇸 USA: 40% Tax Rate<br>Exemption: $12M estate threshold"],
-            ["Spain", 40.4637, -3.7492, "🇪🇸 Spain: 34% Tax Rate<br>Varies by region"],
-            ["France", 46.6034, 1.8883, "🇫🇷 France: 45% Tax Rate<br>Progressive tax system"],
-            ["Netherlands", 52.1326, 5.2913, "🇳🇱 Netherlands: 20% Tax Rate<br>Progressive based on inheritance value"],
-            ["Japan", 36.2048, 138.2529, "🇯🇵 Japan: 55% Tax Rate<br>One of the highest globally"],
-            ["South Korea", 35.9078, 127.7669, "🇰🇷 South Korea: 50% Tax Rate<br>Strict inheritance tax laws"],
-            ["Australia", -25.2744, 133.7751, "🇦🇺 Australia: No inheritance tax"],
-            ["Canada", 56.1304, -106.3468, "🇨🇦 Canada: No inheritance tax"],
-            ["Germany", 51.1657, 10.4515, "🇩🇪 Germany: Up to 30% Tax Rate<br>Progressive tax system"],
-            ["Italy", 41.8719, 12.5674, "🇮🇹 Italy: 4% to 8% Tax Rate<br>Based on relationship to the deceased"],
-            ["Sweden", 60.1282, 18.6435, "🇸🇪 Sweden: No inheritance tax<br>Abolished in 2005"],
-            ["Norway", 60.4720, 8.4689, "🇳🇴 Norway: No inheritance tax<br>Abolished in 2014"],
-            ["Denmark", 56.2639, 9.5018, "🇩🇰 Denmark: 15% to 36.25% Tax Rate<br>Varies based on relationship"],
-            ["Switzerland", 46.8182, 8.2275, "🇨🇭 Switzerland: Varies by Canton<br>Up to 40%"],
-            ["Brazil", -14.2350, -51.9253, "🇧🇷 Brazil: 4% to 8% Tax Rate<br>Varies by state"],
-            ["China", 35.8617, 104.1954, "🇨🇳 China: No inheritance tax<br>But estate reforms are being discussed"]
+            ["United Kingdom", 55.3781, -3.4360, "40%", "https://flagcdn.com/w40/gb.png"],
+            ["United States", 37.0902, -95.7129, "40%", "https://flagcdn.com/w40/us.png"],
+            ["Spain", 40.4637, -3.7492, "34%", "https://flagcdn.com/w40/es.png"],
+            ["France", 46.6034, 1.8883, "45%", "https://flagcdn.com/w40/fr.png"],
+            ["Netherlands", 52.1326, 5.2913, "20%", "https://flagcdn.com/w40/nl.png"],
+            ["Japan", 36.2048, 138.2529, "55%", "https://flagcdn.com/w40/jp.png"],
+            ["South Korea", 35.9078, 127.7669, "50%", "https://flagcdn.com/w40/kr.png"],
+            ["Australia", -25.2744, 133.7751, "No Tax", "https://flagcdn.com/w40/au.png"],
+            ["Canada", 56.1304, -106.3468, "No Tax", "https://flagcdn.com/w40/ca.png"],
+            ["Germany", 51.1657, 10.4515, "30%", "https://flagcdn.com/w40/de.png"],
+            ["Italy", 41.8719, 12.5674, "4%-8%", "https://flagcdn.com/w40/it.png"],
+            ["Sweden", 60.1282, 18.6435, "No Tax", "https://flagcdn.com/w40/se.png"],
+            ["Norway", 60.4720, 8.4689, "No Tax", "https://flagcdn.com/w40/no.png"],
+            ["Denmark", 56.2639, 9.5018, "15%-36%", "https://flagcdn.com/w40/dk.png"],
+            ["Switzerland", 46.8182, 8.2275, "Up to 40%", "https://flagcdn.com/w40/ch.png"],
+            ["Brazil", -14.2350, -51.9253, "4%-8%", "https://flagcdn.com/w40/br.png"],
+            ["China", 35.8617, 104.1954, "No Tax", "https://flagcdn.com/w40/cn.png"]
         ];
 
-        // Add Markers with Hover Popups
+        // Add country shapes with colors based on tax rate
+        function style(feature) {
+            return {
+                fillColor: getColor(feature.properties.taxRate),
+                weight: 1,
+                opacity: 1,
+                color: 'white',
+                fillOpacity: 0.7
+            };
+        }
+
+        // Load world country shapes from GeoJSON
+        fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
+            .then(response => response.json())
+            .then(data => {
+                L.geoJson(data, {
+                    style: function (feature) {
+                        // Default to "No Tax" color if country not listed
+                        var taxRate = 0; 
+                        countries.forEach(country => {
+                            if (feature.properties.name === country[0]) {
+                                taxRate = parseFloat(country[2]) || 0;
+                            }
+                        });
+                        return style({ properties: { taxRate } });
+                    }
+                }).addTo(map);
+            });
+
+        // Add flag markers
         countries.forEach(function(country) {
-            var marker = L.circleMarker([country[1], country[2]], {
-                color: 'red',
-                fillColor: 'red',
-                fillOpacity: 0.7,
-                radius: 6
-            }).addTo(map);
-
-            marker.bindPopup(country[3]);
-
-            // Show popup on hover
-            marker.on('mouseover', function () {
-                this.openPopup();
+            var icon = L.icon({
+                iconUrl: country[4], 
+                iconSize: [32, 21], 
+                iconAnchor: [16, 10]
             });
 
-            marker.on('mouseout', function () {
-                this.closePopup();
-            });
+            var marker = L.marker([country[1], country[2]], { icon: icon }).addTo(map);
+
+            marker.bindPopup(`<strong>${country[0]}</strong><br>Inheritance Tax: ${country[2]}`);
+
+            marker.on('mouseover', function () { this.openPopup(); });
+            marker.on('mouseout', function () { this.closePopup(); });
         });
 
     </script>
