@@ -126,34 +126,31 @@
             ["Australia", -25.2744, 133.7751, 0, "", "No inheritance tax."]
         ];
 
-        // Apply full shading for each country
+        // Apply icons for each country
         countries.forEach(function(country) {
-            var color = getColor(country[3]);
+            var isTop5 = country[4] !== "";
 
-            var circle = L.circle([country[1], country[2]], {
-                radius: 250000,
-                fillColor: color,
-                color: color,
-                weight: 1,
-                fillOpacity: 0.7
-            }).addTo(map)
-            .bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`);
-
-            // FIX: Ensure clicking on Top 5 markers correctly shows popups
-            if (country[4]) {
+            if (isTop5) {
+                // **Top 5 countries: Numbered Square Icons**
                 var marker = L.divIcon({
                     className: 'custom-icon',
-                    html: `<div style="background:#d73027;color:white;padding:6px 10px;border-radius:50%;font-size:14px;font-weight:bold;">${country[4]}</div>`,
+                    html: `<div style="background:#d73027;color:white;padding:6px 10px;border-radius:5px;font-size:14px;font-weight:bold;">${country[4]}</div>`,
                     iconSize: [30, 30]
                 });
 
-                var markerLayer = L.marker([country[1], country[2]], { icon: marker }).addTo(map);
-                
-                markerLayer.bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`);
-
-                markerLayer.on('click', function (e) {
-                    this.openPopup();
+                L.marker([country[1], country[2]], { icon: marker }).addTo(map)
+                .bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`);
+            } else {
+                // **Other countries: Map Pin Icons**
+                var pinIcon = L.icon({
+                    iconUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Red_pog.svg",
+                    iconSize: [15, 20], 
+                    iconAnchor: [7, 20],
+                    popupAnchor: [0, -20]
                 });
+
+                L.marker([country[1], country[2]], { icon: pinIcon }).addTo(map)
+                .bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`);
             }
         });
 
