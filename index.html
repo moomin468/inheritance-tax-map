@@ -122,10 +122,6 @@
             ["Netherlands", 52.1326, 5.2913, 20, "", "Progressive tax up to 20%. Direct heirs get relief."],
             ["Germany", 51.1657, 10.4515, 30, "", "Up to 30% tax. Exemptions: €400K for spouses, €20K for others."],
             ["Italy", 41.8719, 12.5674, 8, "", "Rates 4%-8% based on heir relationship."],
-            ["Switzerland", 46.8182, 8.2275, 40, "", "Varies by canton. Some regions tax up to 40%."],
-            ["Denmark", 56.2639, 9.5018, 36, "", "Progressive tax up to 36.25%. Direct heirs taxed lower."],
-            ["Norway", 60.4720, 8.4689, 0, "", "Abolished in 2014."],
-            ["Sweden", 60.1282, 18.6435, 0, "", "Abolished in 2005."],
             ["Canada", 56.1304, -106.3468, 0, "", "No inheritance tax."],
             ["Australia", -25.2744, 133.7751, 0, "", "No inheritance tax."]
         ];
@@ -134,7 +130,7 @@
         countries.forEach(function(country) {
             var color = getColor(country[3]);
 
-            L.circle([country[1], country[2]], {
+            var circle = L.circle([country[1], country[2]], {
                 radius: 250000,
                 fillColor: color,
                 color: color,
@@ -143,13 +139,21 @@
             }).addTo(map)
             .bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`);
 
+            // FIX: Ensure clicking on Top 5 markers correctly shows popups
             if (country[4]) {
                 var marker = L.divIcon({
                     className: 'custom-icon',
                     html: `<div style="background:#d73027;color:white;padding:6px 10px;border-radius:50%;font-size:14px;font-weight:bold;">${country[4]}</div>`,
                     iconSize: [30, 30]
                 });
-                L.marker([country[1], country[2]], { icon: marker }).addTo(map);
+
+                var markerLayer = L.marker([country[1], country[2]], { icon: marker }).addTo(map);
+                
+                markerLayer.bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`);
+
+                markerLayer.on('click', function (e) {
+                    this.openPopup();
+                });
             }
         });
 
