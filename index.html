@@ -27,13 +27,21 @@
             max-width: 800px;
             margin: 0 auto 20px;
         }
-        #map {
+        #map-container {
+            position: relative;
             width: 85%;
             height: 550px;
             margin: auto;
             border: 2px solid #ccc;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/2/2e/World_map_physical_3D.png') no-repeat center center;
+            background-size: cover;
+            position: absolute;
         }
         .legend {
             position: absolute;
@@ -63,6 +71,15 @@
             font-size: 12px;
             margin-top: 4px;
         }
+        .tooltip {
+            position: absolute;
+            background: white;
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+            font-size: 14px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -71,7 +88,9 @@
     <p>This map highlights countries with varying inheritance tax rates. Darker shades represent higher tax rates, while white indicates no inheritance tax.</p>
 
     <!-- Map Container -->
-    <div id="map"></div>
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
 
     <!-- Legend -->
     <div class="legend">
@@ -83,33 +102,26 @@
         </div>
     </div>
 
+    <!-- Tooltip for hover -->
+    <div class="tooltip" id="tooltip"></div>
+
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
-        // Initialize the map with zoom disabled and panning disabled
+        // Initialize the map with a static background
         var map = L.map('map', {
             center: [20, 0],
             zoom: 2,
             zoomControl: false,
             scrollWheelZoom: false,
             doubleClickZoom: false,
-            dragging: false // Disables panning
+            dragging: false,
+            attributionControl: false
         });
 
-        // **NEW MAP STYLE**: Uses blue oceans & green land (NOT black & white)
-        L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        // Define color scale for inheritance tax
-        function getColor(rate) {
-            return rate >= 50 ? '#d73027' :  // Top 5 highest (dark red)
-                   rate >= 40 ? '#fc8d59' :  // High Tax (40-49%)
-                   rate >= 20 ? '#fee08b' :  // Medium Tax (20-39%)
-                   rate > 0   ? '#f7f7f7' :  // Low Tax (1-19%)
-                               '#ffffff';   // No Tax (White)
-        }
+        // Remove tile layer since we're using a static background
+        map.removeControl(map.zoomControl);
 
         // Country Data: [Name, Lat, Lng, Tax Rate, Rank, Detailed Description]
         var countries = [
@@ -126,32 +138,27 @@
             ["Australia", -25.2744, 133.7751, 0, "", "No inheritance tax."]
         ];
 
-        // Apply icons for each country
+        var tooltip = document.getElementById("tooltip");
+
+        // Add markers with hover effect
         countries.forEach(function(country) {
-            var isTop5 = country[4] !== "";
+            var marker = L.marker([country[1], country[2]]).addTo(map);
 
-            if (isTop5) {
-                // **Top 5 countries: Numbered Square Icons**
-                var marker = L.divIcon({
-                    className: 'custom-icon',
-                    html: `<div style="background:#d73027;color:white;padding:6px 10px;border-radius:5px;font-size:14px;font-weight:bold;">${country[4]}</div>`,
-                    iconSize: [30, 30]
-                });
+            marker.on('mouseover', function (e) {
+                tooltip.innerHTML = `<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`;
+                tooltip.style.display = "block";
+                tooltip.style.left = (e.originalEvent.pageX + 10) + "px";
+                tooltip.style.top = (e.originalEvent.pageY - 20) + "px";
+            });
 
-                L.marker([country[1], country[2]], { icon: marker }).addTo(map)
-                .bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`);
-            } else {
-                // **Other countries: Map Pin Icons**
-                var pinIcon = L.icon({
-                    iconUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Red_pog.svg",
-                    iconSize: [15, 20], 
-                    iconAnchor: [7, 20],
-                    popupAnchor: [0, -20]
-                });
+            marker.on('mouseout', function () {
+                tooltip.style.display = "none";
+            });
 
-                L.marker([country[1], country[2]], { icon: pinIcon }).addTo(map)
-                .bindPopup(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`);
-            }
+            marker.on('mousemove', function (e) {
+                tooltip.style.left = (e.originalEvent.pageX + 10) + "px";
+                tooltip.style.top = (e.originalEvent.pageY - 20) + "px";
+            });
         });
 
     </script>
