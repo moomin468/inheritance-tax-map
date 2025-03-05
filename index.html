@@ -49,17 +49,17 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
-        // **Fix Map Center & Zoom (So Japan, US, UK, and All Countries Appear)**
+        // **Default Map View (Full World View)**
         var map = L.map('map', {
-            center: [30, 20],  // Shift center slightly to the right
-            zoom: 2.8,        // Keep it zoomed out but slightly closer
+            center: [20, 0],  // Default center
+            zoom: 2,          // Default zoom
             zoomControl: false,
             scrollWheelZoom: false,
             doubleClickZoom: false,
             dragging: false
         });
 
-        // **Use a Visually Appealing Background Map**
+        // **Visually Appealing Map Background**
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; CartoDB, OpenStreetMap contributors'
         }).addTo(map);
@@ -79,11 +79,11 @@
             ["Australia", -25.2744, 133.7751, 0, "No inheritance tax.", "https://flagcdn.com/w40/au.png"]
         ];
 
-        // **Dynamic Tooltip Positioning (Prevents Cutoff Issues)**
+        // **Fix Tooltip Positioning (Prevents Cutoff Issues)**
         countries.forEach(function(country) {
             var marker = L.marker([country[1], country[2]]).addTo(map);
 
-            // **Adjust Tooltip Direction Based on Position**
+            // Adjust tooltip direction dynamically based on position
             let tooltipDirection = "top";
             let tooltipOffset = [0, -10];
 
@@ -93,10 +93,10 @@
             } else if (country[1] < -20) { // Australia (Low Latitudes)
                 tooltipDirection = "top";
                 tooltipOffset = [0, -10];
-            } else if (country[2] < -90) { // US, Canada (Far Left)
+            } else if (country[2] < -100) { // US, Canada (Far Left)
                 tooltipDirection = "right";
                 tooltipOffset = [10, 0];
-            } else if (country[2] > 90) { // Japan, South Korea (Far Right)
+            } else if (country[2] > 100) { // Japan, South Korea (Far Right)
                 tooltipDirection = "left";
                 tooltipOffset = [-10, 0];
             }
