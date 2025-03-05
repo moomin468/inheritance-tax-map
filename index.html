@@ -44,6 +44,8 @@
             font-size: 14px;
             display: none;
             pointer-events: none;
+            font-weight: bold;
+            text-align: left;
         }
     </style>
 </head>
@@ -72,12 +74,12 @@
             dragging: false
         });
 
-        // **Visually Appealing Map Background (Dark Terrain Map)**
+        // **Visually Appealing Map Background**
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; CartoDB, OpenStreetMap contributors'
         }).addTo(map);
 
-        // Country Data: [Name, Lat, Lng, Tax Rate, Rank, Detailed Description]
+        // Country Data: [Name, Lat, Lng, Tax Rate, Rank, Description]
         var countries = [
             ["Japan", 36.2048, 138.2529, 55, "#1", "Highest tax globally (55%). No exemptions. Heirs face heavy taxation."],
             ["South Korea", 35.9078, 127.7669, 50, "#2", "Strict inheritance tax (50%). Some exemptions for direct heirs."],
@@ -101,17 +103,17 @@
             marker.on('mouseover', function (e) {
                 tooltip.innerHTML = `<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`;
                 tooltip.style.display = "block";
-                tooltip.style.left = (e.originalEvent.pageX + 10) + "px";
-                tooltip.style.top = (e.originalEvent.pageY - 20) + "px";
+                tooltip.style.left = e.originalEvent.pageX + 15 + "px";
+                tooltip.style.top = e.originalEvent.pageY - 20 + "px";
+            });
+
+            marker.on('mousemove', function (e) {
+                tooltip.style.left = e.originalEvent.pageX + 15 + "px";
+                tooltip.style.top = e.originalEvent.pageY - 20 + "px";
             });
 
             marker.on('mouseout', function () {
                 tooltip.style.display = "none";
-            });
-
-            marker.on('mousemove', function (e) {
-                tooltip.style.left = (e.originalEvent.pageX + 10) + "px";
-                tooltip.style.top = (e.originalEvent.pageY - 20) + "px";
             });
         });
 
