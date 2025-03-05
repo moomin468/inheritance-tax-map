@@ -3,29 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inheritance Tax Rates Worldwide</title>
+    <title>Inheritance Tax Map</title>
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
+    <!-- Custom Font -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
         body {
             text-align: center;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'League Spartan', sans-serif;
+            background-color: #ffffff; /* Background set to white */
             margin: 0;
             padding: 0;
-        }
-        h1 {
-            font-size: 28px;
-            color: #333;
-            margin-top: 20px;
-        }
-        p {
-            font-size: 16px;
-            color: #666;
-            max-width: 800px;
-            margin: 0 auto 20px;
         }
         #map {
             width: 85%;
@@ -39,9 +31,6 @@
 </head>
 <body>
 
-    <h1>Inheritance Tax Rates Worldwide</h1>
-    <p>Hover over the countries to see inheritance tax rates.</p>
-
     <!-- Map Container -->
     <div id="map"></div>
 
@@ -49,7 +38,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
-        // **Default Map View (Full World View)**
+        // **Default Full Map View**
         var map = L.map('map', {
             center: [20, 0],  // Default center
             zoom: 2,          // Default zoom
@@ -64,54 +53,35 @@
             attribution: '&copy; CartoDB, OpenStreetMap contributors'
         }).addTo(map);
 
-        // Country Data: [Name, Lat, Lng, Tax Rate, Description, Flag URL]
+        // **Updated & Corrected Country Data: [Name, Lat, Lng, Correct Tax Info, Flag URL]**
         var countries = [
-            ["Japan", 36.2048, 138.2529, 55, "Highest tax globally (55%). No exemptions. Heirs face heavy taxation.", "https://flagcdn.com/w40/jp.png"],
-            ["South Korea", 35.9078, 127.7669, 50, "Strict inheritance tax (50%). Some exemptions for direct heirs.", "https://flagcdn.com/w40/kr.png"],
-            ["France", 46.6034, 1.8883, 45, "Progressive taxation (up to 45%). Exemption: €100K per child.", "https://flagcdn.com/w40/fr.png"],
-            ["United Kingdom", 55.3781, -3.4360, 40, "40% tax above £325K. Exemption for spouse & charity donations.", "https://flagcdn.com/w40/gb.png"],
-            ["United States", 37.0902, -95.7129, 40, "Federal estate tax: 40%. Exemption: $13.61M per person.", "https://flagcdn.com/w40/us.png"],
-            ["Spain", 40.4637, -3.7492, 34, "Varies by region. Wealthy heirs taxed more heavily.", "https://flagcdn.com/w40/es.png"],
-            ["Netherlands", 52.1326, 5.2913, 20, "Progressive tax up to 20%. Direct heirs get relief.", "https://flagcdn.com/w40/nl.png"],
-            ["Germany", 51.1657, 10.4515, 30, "Up to 30% tax. Exemptions: €400K for spouses, €20K for others.", "https://flagcdn.com/w40/de.png"],
-            ["Italy", 41.8719, 12.5674, 8, "Rates 4%-8% based on heir relationship.", "https://flagcdn.com/w40/it.png"],
-            ["Canada", 56.1304, -106.3468, 0, "No inheritance tax.", "https://flagcdn.com/w40/ca.png"],
-            ["Australia", -25.2744, 133.7751, 0, "No inheritance tax.", "https://flagcdn.com/w40/au.png"]
+            ["Japan", 36.2048, 138.2529, "Up to 55% above ¥30M", "https://flagcdn.com/w40/jp.png"],
+            ["South Korea", 35.9078, 127.7669, "Up to 50% above KR₩3B", "https://flagcdn.com/w40/kr.png"],
+            ["France", 46.6034, 1.8883, "Up to 45% above €1.8M", "https://flagcdn.com/w40/fr.png"],
+            ["United Kingdom", 55.3781, -3.4360, "40% above £325,000", "https://flagcdn.com/w40/gb.png"],
+            ["United States", 37.0902, -95.7129, "40% above $13.61M", "https://flagcdn.com/w40/us.png"],
+            ["Spain", 40.4637, -3.7492, "Up to 34%, varies by region", "https://flagcdn.com/w40/es.png"],
+            ["Netherlands", 52.1326, 5.2913, "Up to 20% based on relationship", "https://flagcdn.com/w40/nl.png"],
+            ["Germany", 51.1657, 10.4515, "Up to 30%, exemptions apply", "https://flagcdn.com/w40/de.png"],
+            ["Italy", 41.8719, 12.5674, "4%-8% based on heir relationship", "https://flagcdn.com/w40/it.png"],
+            ["Canada", 56.1304, -106.3468, "No inheritance tax", "https://flagcdn.com/w40/ca.png"],
+            ["Australia", -25.2744, 133.7751, "No inheritance tax", "https://flagcdn.com/w40/au.png"]
         ];
 
-        // **Fix Tooltip Positioning (Prevents Cutoff Issues)**
+        // **Tooltip Positioning & Flag on Right**
         countries.forEach(function(country) {
             var marker = L.marker([country[1], country[2]]).addTo(map);
 
-            // Adjust tooltip direction dynamically based on position
-            let tooltipDirection = "top";
-            let tooltipOffset = [0, -10];
-
-            if (country[1] > 50) { // Canada, UK (High Latitudes)
-                tooltipDirection = "bottom";
-                tooltipOffset = [0, 10];
-            } else if (country[1] < -20) { // Australia (Low Latitudes)
-                tooltipDirection = "top";
-                tooltipOffset = [0, -10];
-            } else if (country[2] < -100) { // US, Canada (Far Left)
-                tooltipDirection = "right";
-                tooltipOffset = [10, 0];
-            } else if (country[2] > 100) { // Japan, South Korea (Far Right)
-                tooltipDirection = "left";
-                tooltipOffset = [-10, 0];
-            }
-
             marker.bindTooltip(`
                 <div style="display: flex; align-items: center;">
-                    <img src="${country[5]}" alt="Flag" style="width: 20px; height: 14px; margin-right: 6px;">
                     <strong>${country[0]}</strong>
+                    <img src="${country[4]}" alt="Flag" style="width: 20px; height: 14px; margin-left: 6px;">
                 </div>
-                <br>Tax Rate: ${country[2]}%
-                <br>${country[4]}
+                <br>${country[3]}
             `, {
                 permanent: false,
-                direction: tooltipDirection,
-                offset: tooltipOffset
+                direction: "top",
+                offset: [0, -10]
             });
         });
 
