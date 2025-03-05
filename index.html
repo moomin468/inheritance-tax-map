@@ -35,18 +35,6 @@
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
         }
-        .tooltip {
-            position: absolute;
-            background: white;
-            padding: 8px;
-            border-radius: 5px;
-            box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
-            font-size: 14px;
-            display: none;
-            pointer-events: none;
-            font-weight: bold;
-            text-align: left;
-        }
     </style>
 </head>
 <body>
@@ -56,9 +44,6 @@
 
     <!-- Map Container -->
     <div id="map"></div>
-
-    <!-- Tooltip for hover -->
-    <div class="tooltip" id="tooltip"></div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -94,27 +79,14 @@
             ["Australia", -25.2744, 133.7751, 0, "", "No inheritance tax."]
         ];
 
-        var tooltip = document.getElementById("tooltip");
-
-        // Add markers with hover effect
+        // Add markers with **tooltips on hover**
         countries.forEach(function(country) {
-            var marker = L.marker([country[1], country[2]]).addTo(map);
-
-            marker.on('mouseover', function (e) {
-                tooltip.innerHTML = `<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`;
-                tooltip.style.display = "block";
-                tooltip.style.left = e.originalEvent.pageX + 15 + "px";
-                tooltip.style.top = e.originalEvent.pageY - 20 + "px";
-            });
-
-            marker.on('mousemove', function (e) {
-                tooltip.style.left = e.originalEvent.pageX + 15 + "px";
-                tooltip.style.top = e.originalEvent.pageY - 20 + "px";
-            });
-
-            marker.on('mouseout', function () {
-                tooltip.style.display = "none";
-            });
+            L.marker([country[1], country[2]])
+                .addTo(map)
+                .bindTooltip(`<strong>${country[0]}</strong><br>Tax Rate: ${country[3]}%<br>${country[5]}`, { 
+                    permanent: false, 
+                    direction: "top"
+                });
         });
 
     </script>
