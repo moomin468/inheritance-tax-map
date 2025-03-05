@@ -35,34 +35,6 @@
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
         }
-        .legend {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
-            line-height: 18px;
-            text-align: left;
-        }
-        .legend-title {
-            font-weight: bold;
-            font-size: 16px;
-        }
-        .gradient-bar {
-            width: 180px;
-            height: 12px;
-            background: linear-gradient(to right, #ffffff, #fee08b, #fc8d59, #d73027);
-            border-radius: 5px;
-        }
-        .gradient-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            margin-top: 4px;
-        }
         .tooltip {
             position: absolute;
             background: white;
@@ -78,20 +50,10 @@
 <body>
 
     <h1>Inheritance Tax Rates Worldwide</h1>
-    <p>This map highlights countries with varying inheritance tax rates. Darker shades represent higher tax rates, while white indicates no inheritance tax.</p>
+    <p>Hover over the countries to see inheritance tax rates.</p>
 
     <!-- Map Container -->
     <div id="map"></div>
-
-    <!-- Legend -->
-    <div class="legend">
-        <div class="legend-title">Inheritance Tax Rate (%)</div>
-        <div class="gradient-bar"></div>
-        <div class="gradient-labels">
-            <span>0%</span>
-            <span>55%</span>
-        </div>
-    </div>
 
     <!-- Tooltip for hover -->
     <div class="tooltip" id="tooltip"></div>
@@ -100,7 +62,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
-        // Initialize the map with zoom disabled and panning disabled
+        // Initialize the map with a visually appealing background (No API key needed)
         var map = L.map('map', {
             center: [20, 0],
             zoom: 2,
@@ -110,9 +72,9 @@
             dragging: false
         });
 
-        // **NEW Visually Appealing Tile Layer**  
-        L.tileLayer('https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token=YOUR_ACCESS_TOKEN', {
-            attribution: '&copy; Jawg Maps, OpenStreetMap contributors'
+        // **Visually Appealing Map Background (Dark Terrain Map)**
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; CartoDB, OpenStreetMap contributors'
         }).addTo(map);
 
         // Country Data: [Name, Lat, Lng, Tax Rate, Rank, Detailed Description]
