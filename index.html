@@ -49,10 +49,10 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
-        // Initialize the map with zoom adjusted to remove excessive ocean space
+        // **Adjust map center and zoom to include all relevant countries**
         var map = L.map('map', {
-            center: [30, 10], // Shift map center to focus on populated areas
-            zoom: 3, // Slightly zoom in to remove empty ocean areas
+            center: [40, 0], // Moves center slightly higher to include Japan & US
+            zoom: 3.3, // Increased zoom to keep ocean areas minimized while showing all countries
             zoomControl: false,
             scrollWheelZoom: false,
             doubleClickZoom: false,
@@ -79,7 +79,7 @@
             ["Australia", -25.2744, 133.7751, 0, "", "No inheritance tax.", "https://flagcdn.com/w40/au.png"]
         ];
 
-        // Add markers with **flags & tooltips on hover**
+        // **Fix Tooltip Positioning** (Ensures it stays inside the map)
         countries.forEach(function(country) {
             L.marker([country[1], country[2]])
                 .addTo(map)
@@ -92,7 +92,8 @@
                     <br>${country[5]}
                 `, { 
                     permanent: false, 
-                    direction: "top"
+                    direction: country[1] > 50 ? "bottom" : "top", // Adjusts direction based on latitude
+                    offset: country[1] > 50 ? [0, 10] : [0, -10] // Keeps tooltips inside the map
                 });
         });
 
