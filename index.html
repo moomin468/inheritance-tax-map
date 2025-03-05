@@ -49,17 +49,17 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
-        // **Slightly Adjusted Zoom & Center (Japan & US now included, Ocean cropped slightly)**
+        // **Fix Map Center & Zoom (So Japan, US, UK, and All Countries Appear)**
         var map = L.map('map', {
-            center: [30, 0],  // Center adjusted to balance all countries
-            zoom: 2.6,        // Slight zoom to remove excessive ocean, while keeping all countries visible
+            center: [30, 20],  // Shift center slightly to the right
+            zoom: 2.8,        // Keep it zoomed out but slightly closer
             zoomControl: false,
             scrollWheelZoom: false,
             doubleClickZoom: false,
             dragging: false
         });
 
-        // **Visually Appealing Map Background**
+        // **Use a Visually Appealing Background Map**
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; CartoDB, OpenStreetMap contributors'
         }).addTo(map);
@@ -79,24 +79,24 @@
             ["Australia", -25.2744, 133.7751, 0, "No inheritance tax.", "https://flagcdn.com/w40/au.png"]
         ];
 
-        // **Fix Tooltip Positioning (Prevents cutoff issues)**
+        // **Dynamic Tooltip Positioning (Prevents Cutoff Issues)**
         countries.forEach(function(country) {
             var marker = L.marker([country[1], country[2]]).addTo(map);
 
-            // **Adjust Tooltip Direction Dynamically**
+            // **Adjust Tooltip Direction Based on Position**
             let tooltipDirection = "top";
             let tooltipOffset = [0, -10];
 
-            if (country[1] > 50) { // Countries near the top (e.g., Canada, UK)
+            if (country[1] > 50) { // Canada, UK (High Latitudes)
                 tooltipDirection = "bottom";
                 tooltipOffset = [0, 10];
-            } else if (country[1] < -20) { // Countries near the bottom (e.g., Australia)
+            } else if (country[1] < -20) { // Australia (Low Latitudes)
                 tooltipDirection = "top";
                 tooltipOffset = [0, -10];
-            } else if (country[2] < -100) { // Countries far left (e.g., US, Canada)
+            } else if (country[2] < -90) { // US, Canada (Far Left)
                 tooltipDirection = "right";
                 tooltipOffset = [10, 0];
-            } else if (country[2] > 100) { // Countries far right (e.g., Japan, South Korea)
+            } else if (country[2] > 90) { // Japan, South Korea (Far Right)
                 tooltipDirection = "left";
                 tooltipOffset = [-10, 0];
             }
