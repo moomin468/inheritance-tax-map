@@ -15,7 +15,7 @@
         body {
             text-align: center;
             font-family: 'League Spartan', sans-serif;
-            background-color: #ffffff; /* Background set to white */
+            background-color: #ffffff;
             margin: 0;
             padding: 0;
         }
@@ -38,6 +38,42 @@
             box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
             text-align: left;
         }
+        .comparison-box {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+        }
+        .dropdown-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        select {
+            width: 45%;
+            padding: 5px;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        .comparison-result {
+            text-align: left;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .reset-btn {
+            margin-top: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+            border: none;
+            background-color: #d73027;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -45,74 +81,7 @@
     <!-- Map Container -->
     <div id="map"></div>
 
-    <!-- Bottom Left: Last Reviewed Date -->
-    <div class="review-note">
-        Last reviewed: 10 March 2025
-    </div>
-
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-    <script>
-        // **Default Full Map View (NO CHANGES)**
-        var map = L.map('map', {
-            center: [20, 0],  // Default center
-            zoom: 2,          // Default zoom
-            zoomControl: false,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            dragging: false
-        });
-
-        // **Visually Appealing Map Background (NO CHANGES)**
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; CartoDB, OpenStreetMap contributors'
-        }).addTo(map);
-
-        // **Updated Country Data (Converted Tax Thresholds to GBP & Added Exemptions + Who Pays)**
-        var countries = [
-            ["Japan", 36.2048, 138.2529, "Up to 55% above £158,000", "Spouses exempt, children taxed", "Estate Tax (Paid Before Distribution)", "https://flagcdn.com/w40/jp.png"],
-            ["South Korea", 35.9078, 127.7669, "Up to 50% above £1.8M", "Spouses exempt, children taxed", "Estate Tax (Paid Before Distribution)", "https://flagcdn.com/w40/kr.png"],
-            ["France", 46.6034, 1.8883, "Up to 45% above £1.5M", "Spouses exempt, children taxed up to 45%", "Inheritance Tax (Paid by Heirs After Receiving)", "https://flagcdn.com/w40/fr.png"],
-            ["United Kingdom", 55.3781, -3.4360, "40% above £325,000", "Spouses & charities exempt", "Estate Tax (Paid Before Distribution)", "https://flagcdn.com/w40/gb.png"],
-            ["United States", 37.0902, -95.7129, "40% above £10.7M", "Spouses exempt, children taxed", "Estate Tax (Paid Before Distribution)", "https://flagcdn.com/w40/us.png"],
-            ["Spain", 40.4637, -3.7492, "Up to 34%, varies by region", "Spouses & children taxed at lower rates", "Inheritance Tax (Paid by Heirs After Receiving)", "https://flagcdn.com/w40/es.png"],
-            ["Netherlands", 52.1326, 5.2913, "Up to 20% based on relationship", "Spouses & children taxed at reduced rates", "Inheritance Tax (Paid by Heirs After Receiving)", "https://flagcdn.com/w40/nl.png"],
-            ["Germany", 51.1657, 10.4515, "Up to 30%, exemptions apply", "Spouses & children receive large exemptions", "Inheritance Tax (Paid by Heirs After Receiving)", "https://flagcdn.com/w40/de.png"],
-            ["Italy", 41.8719, 12.5674, "4%-8% based on heir relationship", "Spouses & children taxed at lower rates", "Inheritance Tax (Paid by Heirs After Receiving)", "https://flagcdn.com/w40/it.png"],
-            ["Sweden", 60.1282, 18.6435, "Abolished in 2005", "N/A", "N/A", "https://flagcdn.com/w40/se.png"],
-            ["Norway", 60.4720, 8.4689, "Abolished in 2014", "N/A", "N/A", "https://flagcdn.com/w40/no.png"],
-            ["Canada", 56.1304, -106.3468, "No inheritance tax", "N/A", "N/A", "https://flagcdn.com/w40/ca.png"],
-            ["Australia", -25.2744, 133.7751, "No inheritance tax", "N/A", "N/A", "https://flagcdn.com/w40/au.png"]
-        ];
-
-        // **Markers for Each Country (Fixed Icon Issue)**
-        countries.forEach(function(country) {
-            var markerIcon = L.icon({
-                iconUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Red_pog.svg",
-                iconSize: [14, 18], // Adjusted size to prevent disappearing
-                iconAnchor: [7, 18],
-                popupAnchor: [0, -18]
-            });
-
-            var marker = L.marker([country[1], country[2]], { icon: markerIcon }).addTo(map);
-
-            marker.bindTooltip(`
-                <div style="display: flex; align-items: center;">
-                    <strong>${country[0]}</strong>
-                    <img src="${country[6]}" alt="Flag" style="width: 20px; height: 14px; margin-left: 6px;">
-                </div>
-                <br><strong>Tax Rate:</strong> ${country[3]}
-                <br><strong>Exemptions:</strong> ${country[4]}
-                <br><strong>Who Pays?</strong> ${country[5]}
-            `, {
-                permanent: false,
-                direction: "top",
-                offset: [0, -10]
-            });
-        });
-
-    </script>
-
-</body>
-</html>
+    <!-- Comparison Box -->
+    <div class="comparison-box">
+        <h3>Compare Inheritance Tax Systems</h3>
+        <div class="dropdown-container
