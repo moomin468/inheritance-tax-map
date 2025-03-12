@@ -27,7 +27,7 @@
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
         }
-        .legend {
+        .legend-container {
             position: absolute;
             bottom: 15px;
             left: 20px;
@@ -38,16 +38,6 @@
             box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
             text-align: left;
         }
-        .review-date {
-            position: absolute;
-            bottom: 15px;
-            right: 20px;
-            background: white;
-            padding: 5px 8px;
-            border-radius: 5px;
-            font-size: 12px;
-            box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
-        }
     </style>
 </head>
 <body>
@@ -55,13 +45,9 @@
     <!-- Map Container -->
     <div id="map"></div>
 
-    <!-- Key for Red Upward Arrow -->
-    <div class="legend">
-        🔺 <strong>Highest-Taxing Countries</strong>
-    </div>
-
-    <!-- Last Reviewed Date -->
-    <div class="review-date">
+    <!-- Bottom Left Info: Highest Taxing Countries + Last Reviewed Date -->
+    <div class="legend-container">
+        🔺 <strong>Highest-Taxing Countries</strong><br>
         Last reviewed: 10 March 2025
     </div>
 
@@ -69,7 +55,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
-        // **Default Full Map View (No changes)**
+        // **Using Your Original Map Settings (NO CHANGES)**
         var map = L.map('map', {
             center: [20, 0],  // Default center
             zoom: 2,          // Default zoom
@@ -79,12 +65,12 @@
             dragging: false
         });
 
-        // **Map Background (No changes)**
+        // **Using Your Original Map Background (NO CHANGES)**
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; CartoDB, OpenStreetMap contributors'
         }).addTo(map);
 
-        // **Updated & Corrected Country Data: [Name, Lat, Lng, Tax Info (Converted to GBP), Flag URL, Is Top 5?]**
+        // **Countries List (NO CHANGES TO EXISTING ONES, JUST ADDED 🔺 FOR TOP 5)**
         var countries = [
             ["Japan", 36.2048, 138.2529, "Up to 55% above £158,000", "https://flagcdn.com/w40/jp.png", true],
             ["South Korea", 35.9078, 127.7669, "Up to 50% above £1.8M", "https://flagcdn.com/w40/kr.png", true],
@@ -101,19 +87,19 @@
             ["Australia", -25.2744, 133.7751, "No inheritance tax", "https://flagcdn.com/w40/au.png", false]
         ];
 
-        // **Add Markers for Each Country**
+        // **Markers for Each Country (NO CHANGES, JUST ADDED 🔺 FOR TOP 5)**
         countries.forEach(function(country) {
             var markerIcon;
             
             if (country[5]) {
-                // **🔺 Red Upward Arrow for Top 5 Highest Taxing Countries**
+                // **🔺 Red Upward Arrow for Top 5 Highest-Taxing Countries**
                 markerIcon = L.divIcon({
                     className: 'custom-icon',
                     html: `<div style="color:red;font-size:16px;font-weight:bold;">🔺</div>`,
                     iconSize: [15, 15]
                 });
             } else {
-                // **Standard Marker (Same as Before)**
+                // **Your Original Standard Marker (NO CHANGES)**
                 markerIcon = L.icon({
                     iconUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Red_pog.svg",
                     iconSize: [15, 20], 
@@ -141,4 +127,3 @@
 
 </body>
 </html>
-
