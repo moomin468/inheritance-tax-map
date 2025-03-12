@@ -27,6 +27,17 @@
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
         }
+        .review-note {
+            position: absolute;
+            bottom: 15px;
+            left: 20px;
+            background: white;
+            padding: 5px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -34,11 +45,16 @@
     <!-- Map Container -->
     <div id="map"></div>
 
+    <!-- Bottom Left: Last Reviewed Date -->
+    <div class="review-note">
+        Last reviewed: 10 March 2025
+    </div>
+
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
-        // **Default Full Map View**
+        // **Default Full Map View (NO CHANGES)**
         var map = L.map('map', {
             center: [20, 0],  // Default center
             zoom: 2,          // Default zoom
@@ -48,29 +64,38 @@
             dragging: false
         });
 
-        // **Visually Appealing Map Background**
+        // **Visually Appealing Map Background (NO CHANGES)**
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; CartoDB, OpenStreetMap contributors'
         }).addTo(map);
 
-        // **Updated & Corrected Country Data: [Name, Lat, Lng, Correct Tax Info, Flag URL]**
+        // **Updated Country Data (Converted Tax Thresholds to GBP)**
         var countries = [
-            ["Japan", 36.2048, 138.2529, "Up to 55% above ¥30M", "https://flagcdn.com/w40/jp.png"],
-            ["South Korea", 35.9078, 127.7669, "Up to 50% above KR₩3B", "https://flagcdn.com/w40/kr.png"],
-            ["France", 46.6034, 1.8883, "Up to 45% above €1.8M", "https://flagcdn.com/w40/fr.png"],
+            ["Japan", 36.2048, 138.2529, "Up to 55% above £158,000", "https://flagcdn.com/w40/jp.png"],
+            ["South Korea", 35.9078, 127.7669, "Up to 50% above £1.8M", "https://flagcdn.com/w40/kr.png"],
+            ["France", 46.6034, 1.8883, "Up to 45% above £1.5M", "https://flagcdn.com/w40/fr.png"],
             ["United Kingdom", 55.3781, -3.4360, "40% above £325,000", "https://flagcdn.com/w40/gb.png"],
-            ["United States", 37.0902, -95.7129, "40% above $13.61M", "https://flagcdn.com/w40/us.png"],
+            ["United States", 37.0902, -95.7129, "40% above £10.7M", "https://flagcdn.com/w40/us.png"],
             ["Spain", 40.4637, -3.7492, "Up to 34%, varies by region", "https://flagcdn.com/w40/es.png"],
             ["Netherlands", 52.1326, 5.2913, "Up to 20% based on relationship", "https://flagcdn.com/w40/nl.png"],
             ["Germany", 51.1657, 10.4515, "Up to 30%, exemptions apply", "https://flagcdn.com/w40/de.png"],
             ["Italy", 41.8719, 12.5674, "4%-8% based on heir relationship", "https://flagcdn.com/w40/it.png"],
+            ["Sweden", 60.1282, 18.6435, "Abolished in 2005", "https://flagcdn.com/w40/se.png"],
+            ["Norway", 60.4720, 8.4689, "Abolished in 2014", "https://flagcdn.com/w40/no.png"],
             ["Canada", 56.1304, -106.3468, "No inheritance tax", "https://flagcdn.com/w40/ca.png"],
             ["Australia", -25.2744, 133.7751, "No inheritance tax", "https://flagcdn.com/w40/au.png"]
         ];
 
-        // **Tooltip Positioning & Flag on Right**
+        // **Markers for Each Country (Reduced Size Slightly)**
         countries.forEach(function(country) {
-            var marker = L.marker([country[1], country[2]]).addTo(map);
+            var markerIcon = L.icon({
+                iconUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Red_pog.svg",
+                iconSize: [12, 16], // Reduced marker size slightly
+                iconAnchor: [6, 16],
+                popupAnchor: [0, -16]
+            });
+
+            var marker = L.marker([country[1], country[2]], { icon: markerIcon }).addTo(map);
 
             marker.bindTooltip(`
                 <div style="display: flex; align-items: center;">
@@ -89,5 +114,3 @@
 
 </body>
 </html>
-
-
