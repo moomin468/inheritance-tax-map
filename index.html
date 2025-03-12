@@ -38,59 +38,12 @@
             box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
             text-align: left;
         }
-        .comparison-box {
-            margin: 20px auto;
-            width: 80%;
-            max-width: 600px;
-            padding: 15px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-        }
-        .dropdown-container {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        select {
-            width: 45%;
-            padding: 5px;
-            font-size: 14px;
-            border-radius: 5px;
-        }
-        .comparison-result {
-            text-align: left;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        .reset-btn {
-            margin-top: 10px;
-            padding: 5px 10px;
-            font-size: 14px;
-            border: none;
-            background-color: #d73027;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
 
     <!-- Map Container -->
     <div id="map"></div>
-
-    <!-- Comparison Box -->
-    <div class="comparison-box">
-        <h3>Compare Inheritance Tax Systems</h3>
-        <div class="dropdown-container">
-            <select id="country1"></select>
-            <select id="country2"></select>
-        </div>
-        <div class="comparison-result" id="comparison-output"></div>
-        <button class="reset-btn" onclick="resetComparison()">Reset</button>
-    </div>
 
     <!-- Bottom Left: Last Reviewed Date -->
     <div class="review-note">
@@ -101,7 +54,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
-        // Default Full Map View
+        // **Default Full Map View**
         var map = L.map('map', {
             center: [20, 0],  
             zoom: 2,          
@@ -111,23 +64,39 @@
             dragging: false
         });
 
-        // Map Background
+        // **Map Background**
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; CartoDB, OpenStreetMap contributors'
         }).addTo(map);
 
-        // Country Data
+        // **Updated Country Data (Restored All Countries)**
         var countries = [
             ["Japan", 36.2048, 138.2529, "Up to 55% above £158,000", "Spouses exempt, children taxed", "Estate Tax (Paid Before Distribution)", "https://flagcdn.com/w40/jp.png"],
             ["South Korea", 35.9078, 127.7669, "Up to 50% above £1.8M", "Spouses exempt, children taxed", "Estate Tax (Paid Before Distribution)", "https://flagcdn.com/w40/kr.png"],
             ["France", 46.6034, 1.8883, "Up to 45% above £1.5M", "Spouses exempt, children taxed up to 45%", "Inheritance Tax (Paid by Heirs After Receiving)", "https://flagcdn.com/w40/fr.png"],
             ["United Kingdom", 55.3781, -3.4360, "40% above £325,000", "Spouses & charities exempt", "Estate Tax (Paid Before Distribution)", "https://flagcdn.com/w40/gb.png"],
-            ["United States", 37.0902, -95.7129, "40% above £10.7M", "Spouses exempt, children taxed", "Estate Tax (Paid Before Distribution)", "https://flagcdn.com/w40/us.png"]
+            ["United States", 37.0902, -95.7129, "40% above £10.7M", "Spouses exempt, children taxed", "Estate Tax (Paid Before Distribution)", "https://flagcdn.com/w40/us.png"],
+            ["Spain", 40.4637, -3.7492, "Up to 34%, varies by region", "Spouses & children taxed at lower rates", "Inheritance Tax (Paid by Heirs After Receiving)", "https://flagcdn.com/w40/es.png"],
+            ["Netherlands", 52.1326, 5.2913, "Up to 20% based on relationship", "Spouses & children taxed at reduced rates", "Inheritance Tax (Paid by Heirs After Receiving)", "https://flagcdn.com/w40/nl.png"],
+            ["Germany", 51.1657, 10.4515, "Up to 30%, exemptions apply", "Spouses & children receive large exemptions", "Inheritance Tax (Paid by Heirs After Receiving)", "https://flagcdn.com/w40/de.png"],
+            ["Italy", 41.8719, 12.5674, "4%-8% based on heir relationship", "Spouses & children taxed at lower rates", "Inheritance Tax (Paid by Heirs After Receiving)", "https://flagcdn.com/w40/it.png"],
+            ["Sweden", 60.1282, 18.6435, "Abolished in 2005", "N/A", "N/A", "https://flagcdn.com/w40/se.png"],
+            ["Norway", 60.4720, 8.4689, "Abolished in 2014", "N/A", "N/A", "https://flagcdn.com/w40/no.png"],
+            ["Canada", 56.1304, -106.3468, "No inheritance tax", "N/A", "N/A", "https://flagcdn.com/w40/ca.png"],
+            ["Australia", -25.2744, 133.7751, "No inheritance tax", "N/A", "N/A", "https://flagcdn.com/w40/au.png"]
         ];
 
-        // Add Markers
+        // **Markers for Each Country (Fixed & Restored)**
         countries.forEach(function(country) {
-            var marker = L.marker([country[1], country[2]]).addTo(map);
+            var markerIcon = L.icon({
+                iconUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Red_pog.svg",
+                iconSize: [15, 20], // Original size restored
+                iconAnchor: [7, 20],
+                popupAnchor: [0, -20]
+            });
+
+            var marker = L.marker([country[1], country[2]], { icon: markerIcon }).addTo(map);
+
             marker.bindTooltip(`
                 <div style="display: flex; align-items: center;">
                     <strong>${country[0]}</strong>
@@ -143,44 +112,6 @@
             });
         });
 
-        // Populate Dropdowns & Set Default Comparison
-        var country1Dropdown = document.getElementById("country1");
-        var country2Dropdown = document.getElementById("country2");
-
-        function populateDropdowns() {
-            country1Dropdown.innerHTML = "";
-            country2Dropdown.innerHTML = "";
-            countries.forEach(country => {
-                let option1 = new Option(country[0], country[0]);
-                let option2 = new Option(country[0], country[0]);
-                country1Dropdown.add(option1);
-                country2Dropdown.add(option2);
-            });
-            country1Dropdown.value = "United Kingdom";
-            country2Dropdown.value = "Japan";
-            updateComparison();
-        }
-
-        // Prevent Duplicate Selection
-        country1Dropdown.addEventListener("change", updateComparison);
-        country2Dropdown.addEventListener("change", updateComparison);
-
-        function updateComparison() {
-            let c1 = countries.find(c => c[0] === country1Dropdown.value);
-            let c2 = countries.find(c => c[0] === country2Dropdown.value);
-            document.getElementById("comparison-output").innerHTML = `
-                <strong>${c1[0]}</strong> vs. <strong>${c2[0]}</strong><br>
-                <strong>Tax Rate:</strong> ${c1[3]} vs. ${c2[3]}<br>
-                <strong>Exemptions:</strong> ${c1[4]} vs. ${c2[4]}<br>
-                <strong>Who Pays?</strong> ${c1[5]} vs. ${c2[5]}
-            `;
-        }
-
-        function resetComparison() {
-            populateDropdowns();
-        }
-
-        populateDropdowns();
     </script>
 
 </body>
