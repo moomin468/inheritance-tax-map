@@ -27,12 +27,43 @@
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
         }
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+            text-align: left;
+        }
+        .review-date {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
 
     <!-- Map Container -->
     <div id="map"></div>
+
+    <!-- Key for Red Upward Arrow -->
+    <div class="legend">
+        🔺 <strong>Top 5 Highest-Taxing Countries</strong>
+    </div>
+
+    <!-- Last Reviewed Date -->
+    <div class="review-date">
+        Last reviewed: 10 March 2025
+    </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -53,24 +84,45 @@
             attribution: '&copy; CartoDB, OpenStreetMap contributors'
         }).addTo(map);
 
-        // **Updated & Corrected Country Data: [Name, Lat, Lng, Correct Tax Info, Flag URL]**
+        // **Updated & Corrected Country Data: [Name, Lat, Lng, Tax Info (Converted to GBP), Flag URL, Is Top 5?]**
         var countries = [
-            ["Japan", 36.2048, 138.2529, "Up to 55% above ¥30M", "https://flagcdn.com/w40/jp.png"],
-            ["South Korea", 35.9078, 127.7669, "Up to 50% above KR₩3B", "https://flagcdn.com/w40/kr.png"],
-            ["France", 46.6034, 1.8883, "Up to 45% above €1.8M", "https://flagcdn.com/w40/fr.png"],
-            ["United Kingdom", 55.3781, -3.4360, "40% above £325,000", "https://flagcdn.com/w40/gb.png"],
-            ["United States", 37.0902, -95.7129, "40% above $13.61M", "https://flagcdn.com/w40/us.png"],
-            ["Spain", 40.4637, -3.7492, "Up to 34%, varies by region", "https://flagcdn.com/w40/es.png"],
-            ["Netherlands", 52.1326, 5.2913, "Up to 20% based on relationship", "https://flagcdn.com/w40/nl.png"],
-            ["Germany", 51.1657, 10.4515, "Up to 30%, exemptions apply", "https://flagcdn.com/w40/de.png"],
-            ["Italy", 41.8719, 12.5674, "4%-8% based on heir relationship", "https://flagcdn.com/w40/it.png"],
-            ["Canada", 56.1304, -106.3468, "No inheritance tax", "https://flagcdn.com/w40/ca.png"],
-            ["Australia", -25.2744, 133.7751, "No inheritance tax", "https://flagcdn.com/w40/au.png"]
+            ["Japan", 36.2048, 138.2529, "Up to 55% above £158,000", "https://flagcdn.com/w40/jp.png", true],
+            ["South Korea", 35.9078, 127.7669, "Up to 50% above £1.8M", "https://flagcdn.com/w40/kr.png", true],
+            ["France", 46.6034, 1.8883, "Up to 45% above £1.5M", "https://flagcdn.com/w40/fr.png", true],
+            ["United Kingdom", 55.3781, -3.4360, "40% above £325,000", "https://flagcdn.com/w40/gb.png", true],
+            ["United States", 37.0902, -95.7129, "40% above £10.7M", "https://flagcdn.com/w40/us.png", true],
+            ["Spain", 40.4637, -3.7492, "Up to 34%, varies by region", "https://flagcdn.com/w40/es.png", false],
+            ["Netherlands", 52.1326, 5.2913, "Up to 20% based on relationship", "https://flagcdn.com/w40/nl.png", false],
+            ["Germany", 51.1657, 10.4515, "Up to 30%, exemptions apply", "https://flagcdn.com/w40/de.png", false],
+            ["Italy", 41.8719, 12.5674, "4%-8% based on heir relationship", "https://flagcdn.com/w40/it.png", false],
+            ["Sweden", 60.1282, 18.6435, "Abolished in 2005", "https://flagcdn.com/w40/se.png", false],
+            ["Norway", 60.4720, 8.4689, "Abolished in 2014", "https://flagcdn.com/w40/no.png", false],
+            ["Canada", 56.1304, -106.3468, "No inheritance tax", "https://flagcdn.com/w40/ca.png", false],
+            ["Australia", -25.2744, 133.7751, "No inheritance tax", "https://flagcdn.com/w40/au.png", false]
         ];
 
-        // **Tooltip Positioning & Flag on Right**
+        // **Add Markers for Each Country**
         countries.forEach(function(country) {
-            var marker = L.marker([country[1], country[2]]).addTo(map);
+            var markerIcon;
+            
+            if (country[5]) {
+                // **🔺 Red Upward Arrow for Top 5 Highest Taxing Countries**
+                markerIcon = L.divIcon({
+                    className: 'custom-icon',
+                    html: `<div style="color:red;font-size:18px;font-weight:bold;">🔺</div>`,
+                    iconSize: [20, 20]
+                });
+            } else {
+                // **Standard Marker for All Other Countries**
+                markerIcon = L.icon({
+                    iconUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Red_pog.svg",
+                    iconSize: [15, 20], 
+                    iconAnchor: [7, 20],
+                    popupAnchor: [0, -20]
+                });
+            }
+
+            var marker = L.marker([country[1], country[2]], { icon: markerIcon }).addTo(map);
 
             marker.bindTooltip(`
                 <div style="display: flex; align-items: center;">
