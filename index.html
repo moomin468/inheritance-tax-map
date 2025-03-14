@@ -27,12 +27,24 @@
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
         }
+        .bottom-left {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-size: 12px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
 
     <!-- Map Container -->
     <div id="map"></div>
+
+    <div class="bottom-left">
+        <strong>Highest Taxing Countries</strong><br>
+        Last Reviewed: 10 March 2025
+    </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -53,69 +65,73 @@
             attribution: '&copy; CartoDB, OpenStreetMap contributors'
         }).addTo(map);
 
-        // **Updated Country Data with Final Wording**
+        // **Updated Country Data with Flags and Final Wording**
         var countries = [
-            ["United Kingdom", 55.3781, -3.4360, 
+            ["United Kingdom", 55.3781, -3.4360, "gb", 
                 "<strong>Tax Rate:</strong> 40% tax on estates above £325,000<br>" +
                 "<strong>Exemptions:</strong> Spouses exempt; children taxed above threshold<br>" +
                 "<strong>Who Pays?</strong> Estate tax (Paid before distribution)"],
 
-            ["United States", 37.0902, -95.7129, 
+            ["United States", 37.0902, -95.7129, "us",
                 "<strong>Tax Rate:</strong> 40% tax on estates above £11M in 2025<br>" +
                 "<strong>Exemptions:</strong> First £11M per person is tax-free (£22M for married couples)<br>" +
-                "<strong>Who Pays?</strong> Estate tax (Paid before distribution, some states impose additional taxes)"],
+                "<strong>Who Pays?</strong> Estate tax (Paid before distribution)<br>" +
+                "<strong>Note:</strong> Varies greatly across states"],
 
-            ["Japan", 36.2048, 138.2529, 
+            ["Japan", 36.2048, 138.2529, "jp",
                 "<strong>Tax Rate:</strong> 10%-55% tax on inheritances<br>" +
                 "<strong>Exemptions:</strong> First £156K + £31K per heir is tax-free<br>" +
                 "<strong>Who Pays?</strong> Inheritance tax (Paid by heirs)"],
 
-            ["South Korea", 35.9078, 127.7669, 
+            ["South Korea", 35.9078, 127.7669, "kr",
                 "<strong>Tax Rate:</strong> 10%-50% tax on inheritances<br>" +
                 "<strong>Exemptions:</strong> Spouses & children get large tax deductions<br>" +
                 "<strong>Who Pays?</strong> Estate tax (Paid before distribution, changing to inheritance tax in 2028)"],
 
-            ["France", 46.6034, 1.8883, 
+            ["France", 46.6034, 1.8883, "fr",
                 "<strong>Tax Rate:</strong> 5%-45% tax above £85K for direct heirs<br>" +
                 "<strong>Exemptions:</strong> Spouses exempt; children taxed up to 45%<br>" +
                 "<strong>Who Pays?</strong> Inheritance tax (Paid by heirs)"],
 
-            ["Spain", 40.4637, -3.7492, 
+            ["Spain", 40.4637, -3.7492, "es",
                 "<strong>Tax Rate:</strong> Up to 34% tax, varies by region<br>" +
                 "<strong>Exemptions:</strong> Spouses & children get higher tax-free allowances<br>" +
                 "<strong>Who Pays?</strong> Inheritance tax (Paid by heirs)"],
 
-            ["Netherlands", 52.1326, 5.2913, 
+            ["Netherlands", 52.1326, 5.2913, "nl",
                 "<strong>Tax Rate:</strong> 10%-20% tax depending on relationship<br>" +
                 "<strong>Exemptions:</strong> Different reliefs available for spouses & children<br>" +
                 "<strong>Who Pays?</strong> Inheritance tax (Paid by heirs)"],
 
-            ["Germany", 51.1657, 10.4515, 
+            ["Germany", 51.1657, 10.4515, "de",
                 "<strong>Tax Rate:</strong> 7%-30% tax depending on relationship<br>" +
                 "<strong>Exemptions:</strong> Spouses & children get large exemptions<br>" +
                 "<strong>Who Pays?</strong> Inheritance tax (Paid by heirs)"],
 
-            ["Italy", 41.8719, 12.5674, 
+            ["Italy", 41.8719, 12.5674, "it",
                 "<strong>Tax Rate:</strong> 4%-8% tax depending on relationship<br>" +
                 "<strong>Exemptions:</strong> Spouses & children get £850K tax-free<br>" +
                 "<strong>Who Pays?</strong> Inheritance tax (Paid by heirs)"],
 
             // Canada and Australia (No Inheritance Tax)
-            ["Canada", 56.1304, -106.3468, "No Inheritance Tax"],
-            ["Australia", -25.2744, 133.7751, "No Inheritance Tax"],
+            ["Canada", 56.1304, -106.3468, "ca", "No Inheritance Tax"],
+            ["Australia", -25.2744, 133.7751, "au", "No Inheritance Tax"]
         ];
 
-        // **Tooltip Positioning**
+        // **Tooltip Positioning + Flags**
         countries.forEach(function(country) {
+            var tooltipDirection = (country[0] === "United Kingdom" || country[0] === "Japan" || country[0] === "South Korea") ? "left" : "top";
+
             var marker = L.marker([country[1], country[2]]).addTo(map);
             marker.bindTooltip(`
                 <div style="display: flex; align-items: center;">
                     <strong>${country[0]}</strong>
+                    <img src="https://flagcdn.com/w40/${country[3]}.png" alt="Flag" style="width: 20px; height: 14px; margin-left: 6px;">
                 </div>
-                <br>${country[3]}
+                <br>${country[4]}
             `, {
                 permanent: false,
-                direction: "top",
+                direction: tooltipDirection,
                 offset: [0, -10]
             });
         });
