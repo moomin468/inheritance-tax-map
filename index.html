@@ -34,6 +34,16 @@
             font-size: 12px;
             color: #333;
         }
+        .disclaimer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
@@ -42,8 +52,11 @@
     <div id="map"></div>
 
     <div class="bottom-left">
-        <strong>Highest Taxing Countries</strong><br>
-        Last Reviewed: 10 March 2025
+        Last Reviewed: 14 March 2025
+    </div>
+
+    <div class="disclaimer">
+        <em>This interactive map provides a broad look at how different nations approach inheritance tax. However, tax systems are complex, and many exemptions, thresholds, and regional rules can significantly impact actual tax liabilities. Laws also change over time. This map is for informational purposes only and should not be considered tax or financial advice. For precise and up-to-date details, always refer to official sources or consult a tax professional.</em>
     </div>
 
     <!-- Leaflet JS -->
@@ -113,7 +126,6 @@
                 "<strong>Exemptions:</strong> Spouses & children get £850K tax-free<br>" +
                 "<strong>Who Pays?</strong> Inheritance tax (Paid by heirs)"],
 
-            // Canada and Australia (No Inheritance Tax)
             ["Canada", 56.1304, -106.3468, "ca", "No Inheritance Tax"],
             ["Australia", -25.2744, 133.7751, "au", "No Inheritance Tax"]
         ];
