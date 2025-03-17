@@ -79,7 +79,7 @@
             maxZoom: 19
         }).addTo(map);
 
-        // **Country Data with Flags**
+        // **Country Data with Full Information & Flags**
         var countries = [
             ["United Kingdom", 55.3781, -3.4360, "gb", 
                 "<strong>Tax Rate:</strong> 40% tax on estates above £325,000<br>" +
@@ -131,8 +131,10 @@
             ["Australia", -25.2744, 133.7751, "au", "No Inheritance Tax"]
         ];
 
-        // **Add Markers with Tooltips**
+        // **Add Markers with Fixed Tooltip Positioning**
         countries.forEach(function(country) {
+            var tooltipDirection = (country[0] === "Japan" || country[0] === "South Korea") ? "left" : "top";
+
             var marker = L.marker([country[1], country[2]]).addTo(map);
             marker.bindTooltip(`
                 <div style="display: flex; align-items: center;">
@@ -142,7 +144,7 @@
                 <br>${country[4]}
             `, {
                 permanent: false,
-                direction: "top",
+                direction: tooltipDirection,
                 offset: [0, -10]
             });
         });
