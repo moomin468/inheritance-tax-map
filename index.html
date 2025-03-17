@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inheritance Tax Map</title>
 
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Updated Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 
     <!-- Custom Font -->
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
         body {
             text-align: center;
             font-family: 'League Spartan', sans-serif;
-            background-color: #ffffff; /* Background set to white */
+            background-color: #ffffff;
             margin: 0;
             padding: 0;
         }
@@ -56,29 +56,30 @@
     </div>
 
     <div class="disclaimer">
-        <em>This interactive map provides a broad look at how different nations approach inheritance tax. Many other exemptions, thresholds and regional rules exists. This map highlights only a few for comparison purposes and is not a financial advice. For information on the UK system, visit our Legal Framework section. For details on other countries, refer to Bibliography.</em>
+        <em>This interactive map provides a broad look at how different nations approach inheritance tax. Many other exemptions, thresholds, and regional rules exist. This map highlights only a few for comparison purposes and is not financial advice. For information on the UK system, visit our Legal Framework section. For details on other countries, refer to the Bibliography.</em>
     </div>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Updated Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 
     <script>
         // **Default Full Map View**
         var map = L.map('map', {
             center: [20, 0],  // Default center
             zoom: 2,          // Default zoom
-            zoomControl: false,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            dragging: false
+            zoomControl: true,
+            scrollWheelZoom: true,
+            doubleClickZoom: true,
+            dragging: true
         });
 
-        // **Visually Appealing Map Background**
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; CartoDB, OpenStreetMap contributors'
+        // **Using Esri Topographic Map for Stability**
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '&copy; Esri, USGS, NOAA',
+            maxZoom: 19
         }).addTo(map);
 
-        // **Updated Country Data with Flags and Final Wording**
+        // **Country Data with Flags**
         var countries = [
             ["United Kingdom", 55.3781, -3.4360, "gb", 
                 "<strong>Tax Rate:</strong> 40% tax on estates above £325,000<br>" +
@@ -130,10 +131,8 @@
             ["Australia", -25.2744, 133.7751, "au", "No Inheritance Tax"]
         ];
 
-        // **Tooltip Positioning + Flags**
+        // **Add Markers with Tooltips**
         countries.forEach(function(country) {
-            var tooltipDirection = (country[0] === "United Kingdom" || country[0] === "Japan" || country[0] === "South Korea") ? "left" : "top";
-
             var marker = L.marker([country[1], country[2]]).addTo(map);
             marker.bindTooltip(`
                 <div style="display: flex; align-items: center;">
@@ -143,7 +142,7 @@
                 <br>${country[4]}
             `, {
                 permanent: false,
-                direction: tooltipDirection,
+                direction: "top",
                 offset: [0, -10]
             });
         });
@@ -151,5 +150,4 @@
     </script>
 
 </body>
-</html> 
-  
+</html>
